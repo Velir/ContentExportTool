@@ -25,6 +25,10 @@
                 <asp:Button runat="server" ID="btnRunExport" OnClick="btnRunExport_OnClick" Text="Run Export"/><br/><br/>
 
                 <div class="container">
+                    
+                    <asp:Checkbox runat="server" ID="chkIncludeIds"/><span class="header">Include IDs</span><br/>
+                    <span class="notes">Check this box to include item IDs (guid) in the exported file. Item paths are already included.</span><br/><br/>
+
                     <span class="header">Start Item</span><br/>
                      <span class="notes">Enter the path of the starting node. Only content beneath and including this node will be exported. If field is left blank, the starting node will be /sitecore/content</span><br/>
                     <input runat="server" ID="inputStartitem"/>

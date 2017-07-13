@@ -7,8 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ContentExportTool
-{
+namespace ContentExportTool {
     
     
     public partial class ContentExport {
@@ -48,6 +47,15 @@ namespace ContentExportTool
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnRunExport;
+        
+        /// <summary>
+        /// chkIncludeIds control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkIncludeIds;
         
         /// <summary>
         /// inputStartitem control.

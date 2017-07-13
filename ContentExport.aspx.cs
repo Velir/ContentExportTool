@@ -40,6 +40,8 @@ namespace ContentExportTool
                 var linkFields = linkFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
                 var multiFields = multiFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
 
+                var includeIds = chkIncludeIds.Checked;
+
                 var startNode = inputStartitem.Value;
                 if (String.IsNullOrEmpty(startNode)) startNode = "/sitecore/content";
 
@@ -75,7 +77,7 @@ namespace ContentExportTool
 
                 using (StringWriter sw = new StringWriter())
                 {
-                    var headingString = "Item\t" + fields.Aggregate("", (current, field) => current + (field + "\t"))
+                    var headingString = "Item\t" + (includeIds ? "Item ID (guid)\t" : string.Empty) + fields.Aggregate("", (current, field) => current + (field + "\t"))
                     + imageFields.Aggregate("", (current, field) => current + (field + "\t"))
                     + linkFields.Aggregate("", (current, field) => current + (field + "\t"))
                     + multiFields.Aggregate("", (current, field) => current + (field + "\t"));
@@ -85,6 +87,11 @@ namespace ContentExportTool
                     {
                         var itemPath = item.Paths.ContentPath;
                         var itemLine = itemPath + "\t";
+
+                        if (includeIds)
+                        {
+                            itemLine += item.ID + "\t";
+                        }
 
                         foreach (var field in fields)
                         {
