@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -97,7 +97,7 @@ namespace ContentExportTool
                                 }
                                 else
                                 {
-                                    itemLine += itemField.Value + "\t";
+                                    itemLine += RemoveLineEndings(itemField.Value) + "\t";
                                 }
                             }
                         }
@@ -175,6 +175,8 @@ namespace ContentExportTool
                     Response.Output.Write(sw.ToString());
                     Response.Flush();
                     Response.End();
+
+                    litFeedback.Text = "";
                 }
             }
             catch (Exception ex)
@@ -192,7 +194,7 @@ namespace ContentExportTool
             string lineSeparator = ((char)0x2028).ToString();
             string paragraphSeparator = ((char)0x2029).ToString();
 
-            return value.Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty).Replace(lineSeparator, string.Empty).Replace(paragraphSeparator, string.Empty);
+            return value.Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty).Replace(lineSeparator, string.Empty).Replace(paragraphSeparator, string.Empty).Replace("<br/>", string.Empty).Replace("<br />", string.Empty);
         }
     }
 }
