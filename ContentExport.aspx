@@ -8,7 +8,54 @@
 		.header {color: brown}
 		.notes {color: GrayText; font-size: 12px}
 		.container {margin-bottom: 10px; font-family: Arial}
+
+        .advanced .advanced-inner {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .advanced .advanced-btn {
+            color: brown;
+            font-weight: bold;
+            padding-bottom: 10px;
+            cursor:pointer;
+        }
+
+        .advanced .advanced-btn:after {
+            border-style: solid;
+	        border-width: 0.25em 0.25em 0 0;
+	        content: '';
+	        display: inline-block;
+	        height: 0.45em;
+	        left: 0.15em;
+	        position: relative;
+	        vertical-align: top;
+	        width: 0.45em;
+	        top: 0;
+	        transform: rotate(135deg);
+	        margin-left:5px
+        }
+
+        .advanced.open a.advanced-btn:after {
+            top: 0.3em;
+	        transform: rotate(-45deg);
+        }
+
 	</style>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $(".advanced-btn").on("click", function() {
+                if ($(this).parent().hasClass("open")) {
+                    $(this).parent().removeClass("open");
+                } else {
+                    $(this).parent().addClass("open");
+                }
+
+                $(".advanced-inner").slideToggle();
+            });
+        });
+    </script>
 
 </head>
 <body>
@@ -20,8 +67,7 @@
                 <asp:Literal runat="server" ID="litFeedback"></asp:Literal>
             </div>
 
-            <div class="controls">
-
+            <div class="controls">                              
                 <asp:Button runat="server" ID="btnRunExport" OnClick="btnRunExport_OnClick" Text="Run Export"/><br/><br/>
 
                 <div class="container">
@@ -46,20 +92,31 @@
                     <textarea runat="server" ID="inputFields" cols="40" rows="10"></textarea>
                     <br /><br/>
                     
-                    <span class="header">Image Fields</span><br/>
-                    <span class="notes">Enter field names separated by commas</span><br/>
-                    <textarea runat="server" ID="inputImageFields" cols="40" rows="10"></textarea>
-                    <br /><br/>
                     
-                    <span class="header">Link Fields</span><br/>
-                    <span class="notes">Enter field names separated by commas</span><br/>
-                    <textarea runat="server" ID="inputLinkFields" cols="40" rows="10"></textarea>
-                    <br /><br/>
                     
-                    <span class="header">Multilist Fields</span><br/>
-                    <span class="notes">Enter field names separated by commas</span><br/>
-                    <textarea runat="server" ID="inputMultiFields" cols="40" rows="10"></textarea>
-                    <br />
+                    
+                    <div class="advanced">
+                        <a class="advanced-btn">Advanced Fields</a>
+                        <div class="advanced-inner">
+                            <span class="header">Image Fields</span><br/>
+                            <span class="notes">Enter field names separated by commas</span><br/>
+                            <textarea runat="server" ID="inputImageFields" cols="40" rows="10"></textarea>
+                            <br /><br/>
+                    
+                            <span class="header">Link Fields</span><br/>
+                            <span class="notes">Enter field names separated by commas</span><br/>
+                            <textarea runat="server" ID="inputLinkFields" cols="40" rows="10"></textarea>
+                            <br /><br/>
+                    
+                            <span class="header">Multilist Fields</span><br/>
+                            <span class="notes">Enter field names separated by commas</span><br/>
+                            <textarea runat="server" ID="inputMultiFields" cols="40" rows="10"></textarea>
+                            <br /><br/>
+                        
+                            <asp:Button runat="server" ID="btnWebformsExport" OnClick="btnWebformsExport_OnClick" Text="Webforms" /><br/>
+                            <span class="notes">Download all Webforms for Marketers forms and fields</span>
+                        </div>
+                    </div>
                     
                 </div>
                 
