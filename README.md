@@ -8,7 +8,6 @@ Build your project
 
 # Dependencies:
 Sitecore 6.5 or higher<br />
-jQuery 1.11.1 or higher
 
 # To use:
 You must be logged into Sitecore to access the tool<br />
