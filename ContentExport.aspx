@@ -41,6 +41,10 @@
 	        transform: rotate(-45deg);
         }
 
+        .txtCustomDatabase {
+            margin-left: 5px;
+        }
+
 	</style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script>
@@ -53,6 +57,14 @@
                 }
 
                 $(".advanced-inner").slideToggle();
+            });
+
+            $(".ddDatabase").on("change", function() {
+                if ($(this).find("option:selected").val() === "custom") {
+                    $(".txtCustomDatabase").show();
+                } else {
+                    $(".txtCustomDatabase").hide();
+                }
             });
         });
     </script>
@@ -71,6 +83,10 @@
                 <asp:Button runat="server" ID="btnRunExport" OnClick="btnRunExport_OnClick" Text="Run Export"/><br/><br/>
 
                 <div class="container">
+                    
+                    <span class="header">Database</span>
+                    <asp:DropDownList runat="server" ID="ddDatabase" CssClass="ddDatabase"/><input runat="server" class="txtCustomDatabase" ID="txtCustomDatabase" style="display:none"/> <br/>
+                    <span class="notes">Select database. Defaults to web</span><br/><br/>
                     
                     <asp:Checkbox runat="server" ID="chkIncludeIds"/><span class="header">Include IDs</span><br/>
                     <span class="notes">Check this box to include item IDs (guid) in the exported file. Item paths are already included.</span><br/><br/>
@@ -112,6 +128,8 @@
                             <span class="notes">Enter field names separated by commas</span><br/>
                             <textarea runat="server" ID="inputMultiFields" cols="40" rows="10"></textarea>
                             <br /><br/>
+                            
+                            <asp:Button runat="server" ID="btnRunExportDupe" OnClick="btnRunExport_OnClick" Text="Run Export"/><br/><br/>
                         
                             <asp:Button runat="server" ID="btnWebformsExport" OnClick="btnWebformsExport_OnClick" Text="Webforms" /><br/>
                             <span class="notes">Download all Webforms for Marketers forms and fields</span>

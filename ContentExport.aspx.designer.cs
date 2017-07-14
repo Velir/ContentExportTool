@@ -49,6 +49,24 @@ namespace ContentExportTool {
         protected global::System.Web.UI.WebControls.Button btnRunExport;
         
         /// <summary>
+        /// ddDatabase control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddDatabase;
+        
+        /// <summary>
+        /// txtCustomDatabase control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputText txtCustomDatabase;
+        
+        /// <summary>
         /// chkIncludeIds control.
         /// </summary>
         /// <remarks>
@@ -110,6 +128,15 @@ namespace ContentExportTool {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlTextArea inputMultiFields;
+        
+        /// <summary>
+        /// btnRunExportDupe control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnRunExportDupe;
         
         /// <summary>
         /// btnWebformsExport control.

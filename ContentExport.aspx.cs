@@ -12,10 +12,16 @@ namespace ContentExportTool
 {
     public partial class ContentExport : Sitecore.sitecore.admin.AdminPage
     {
-        private readonly Database _db = Sitecore.Configuration.Factory.GetDatabase("web");
+        private Database _db;
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!IsPostBack)
+            {
+                var databases = new List<string>() {"web", "master", "custom"};
+                ddDatabase.DataSource = databases;
+                ddDatabase.DataBind();
+            }
         }
 
         protected override void OnInit(EventArgs e)
@@ -32,6 +38,25 @@ namespace ContentExportTool
                 var imageFieldString = inputImageFields.Value;
                 var linkFieldString = inputLinkFields.Value;
                 var multiFieldString = inputMultiFields.Value;
+
+                var databaseName = ddDatabase.SelectedValue;
+                if (databaseName == "custom")
+                {
+                    databaseName = txtCustomDatabase.Value;
+                }
+                if (String.IsNullOrEmpty(databaseName))
+                {
+                    litFeedback.Text = "You must enter a custom database name, or select a database from the dropdown";
+                    return;
+                }
+
+                _db = Sitecore.Configuration.Factory.GetDatabase(databaseName);
+                if (_db == null)
+                {
+                    litFeedback.Text = "Invalid database. Selected database does not exist.";
+                    return;
+                }
+
                 if (String.IsNullOrEmpty(fieldString) && String.IsNullOrEmpty(imageFieldString) && String.IsNullOrEmpty(linkFieldString) && String.IsNullOrEmpty(multiFieldString))
                 {
                     litFeedback.Text = "You must enter at least one field";
