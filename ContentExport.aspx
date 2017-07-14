@@ -65,6 +65,18 @@
                 } else {
                     $(".txtCustomDatabase").hide();
                 }
+
+                if ($(this).find("option:selected").val() !== "master") {
+                    $(".workflowBox input").each(function() {
+                        $(this).prop("checked", false);
+                    });
+                }
+            });
+
+            $(".workflowBox input").on("change", function () {
+                if ($(this).is(":checked")) {
+                    $(".ddDatabase").val("master");
+                }
             });
         });
     </script>
@@ -128,6 +140,11 @@
                             <span class="notes">Enter field names separated by commas</span><br/>
                             <textarea runat="server" ID="inputMultiFields" cols="40" rows="10"></textarea>
                             <br /><br/>
+                            
+                            <asp:CheckBox runat="server" CssClass="workflowBox" ID="chkWorkflowName"/><span class="header">Workflow</span><br/>
+                            <asp:CheckBox runat="server" CssClass="workflowBox" ID="chkWorkflowState"/><span class="header">Workflow State</span>  <br />
+                            <span class="notes">Workflow options require the database to be set to master</span>
+                            <br/><br/>
                             
                             <asp:Button runat="server" ID="btnRunExportDupe" OnClick="btnRunExport_OnClick" Text="Run Export"/><br/><br/>
                         

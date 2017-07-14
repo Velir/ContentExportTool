@@ -130,6 +130,24 @@ namespace ContentExportTool {
         protected global::System.Web.UI.HtmlControls.HtmlTextArea inputMultiFields;
         
         /// <summary>
+        /// chkWorkflowName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkWorkflowName;
+        
+        /// <summary>
+        /// chkWorkflowState control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkWorkflowState;
+        
+        /// <summary>
         /// btnRunExportDupe control.
         /// </summary>
         /// <remarks>

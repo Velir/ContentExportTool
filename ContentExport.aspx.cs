@@ -44,6 +44,15 @@ namespace ContentExportTool
                 {
                     databaseName = txtCustomDatabase.Value;
                 }
+
+                var includeWorkflowState = chkWorkflowState.Checked;
+                var includeworkflowName = chkWorkflowName.Checked;
+
+                if (includeworkflowName || includeWorkflowState)
+                {
+                    databaseName = "master";
+                }
+
                 if (String.IsNullOrEmpty(databaseName))
                 {
                     litFeedback.Text = "You must enter a custom database name, or select a database from the dropdown";
@@ -57,15 +66,15 @@ namespace ContentExportTool
                     return;
                 }
 
-                if (String.IsNullOrEmpty(fieldString) && String.IsNullOrEmpty(imageFieldString) && String.IsNullOrEmpty(linkFieldString) && String.IsNullOrEmpty(multiFieldString))
-                {
-                    litFeedback.Text = "You must enter at least one field";
-                    return;
-                }
+                //if (CheckIfValidSelection())
+                //{
+                //    litFeedback.Text = "No options selected. You";
+                //    return;
+                //}
                 var fields = fieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
                 var imageFields = imageFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
                 var linkFields = linkFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
-                var multiFields = multiFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
+                var multiFields = multiFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));                
 
                 var includeIds = chkIncludeIds.Checked;
 
@@ -104,10 +113,13 @@ namespace ContentExportTool
 
                 using (StringWriter sw = new StringWriter())
                 {
-                    var headingString = "Item\t" + (includeIds ? "Item ID (guid)\t" : string.Empty) + fields.Aggregate("", (current, field) => current + (field + "\t"))
+                    var headingString = "Item\t" + (includeIds ? "Item ID (guid)\t" : string.Empty) 
+                    + fields.Aggregate("", (current, field) => current + (field + "\t"))
                     + imageFields.Aggregate("", (current, field) => current + (field + "\t"))
                     + linkFields.Aggregate("", (current, field) => current + (field + "\t"))
-                    + multiFields.Aggregate("", (current, field) => current + (field + "\t"));
+                    + multiFields.Aggregate("", (current, field) => current + (field + "\t"))
+                    + (includeworkflowName ? "Workflow\t" : string.Empty)
+                    + (includeWorkflowState ? "Workflow State\t" : string.Empty );
                     sw.WriteLine(headingString);
 
                     foreach (var item in items)
@@ -202,6 +214,46 @@ namespace ContentExportTool
                             }
                         }
 
+                        if (includeWorkflowState || includeworkflowName)
+                        {
+                            var workflowProvider = item.Database.WorkflowProvider;
+                            if (workflowProvider == null)
+                            {
+                                if (includeworkflowName && includeWorkflowState)
+                                {
+                                    itemLine += "\t";
+                                }
+                                itemLine += "\t";
+                            }
+                            else
+                            {
+                                var workflow = workflowProvider.GetWorkflow(item);
+                                if (workflow == null)
+                                {
+                                    if (includeworkflowName && includeWorkflowState)
+                                    {
+                                        itemLine += "\t";
+                                    }
+                                    else
+                                    {
+                                        itemLine += "\t";
+                                    }
+                                }
+                                else
+                                {
+                                    if (includeworkflowName)
+                                    {
+                                        itemLine += workflow + "\t";
+                                    }
+                                    if (includeWorkflowState)
+                                    {
+                                        var workflowState = workflow.GetState(item);
+                                        itemLine += workflowState.DisplayName + "\t";
+                                    }
+                                }
+                            }
+                        }
+
                         sw.WriteLine(itemLine);
 
                     }
@@ -275,6 +327,12 @@ namespace ContentExportTool
         {
             return id.ToString().Replace("{", string.Empty).Replace("}", string.Empty).Replace("-", string.Empty);
         }
+
+        //protected bool CheckIfValidSelection()
+        //{
+        //    return String.IsNullOrEmpty(fieldString) && String.IsNullOrEmpty(imageFieldString) &&
+        //           String.IsNullOrEmpty(linkFieldString) && String.IsNullOrEmpty(multiFieldString);
+        //}
 
         protected string GetFieldLink(Item field)
         {
