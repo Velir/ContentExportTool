@@ -158,6 +158,10 @@
                             <asp:CheckBox runat="server" CssClass="workflowBox" ID="chkWorkflowState"/><span class="header">Workflow State</span>  <br />
                             <span class="notes">Workflow options require the database to be set to master</span>
                             <br/><br/>
+
+                            <asp:CheckBox runat="server" ID="chkAllLanguages"/><span class="header">Get All Language Versions</span><br/>
+                            <span class="notes">This will get the selected field values for all languages that each item has an existing version for</span>
+                            <br/><br/>
                             
                             <asp:Button runat="server" ID="btnRunExportDupe" OnClick="btnRunExport_OnClick" Text="Run Export"/><br/><br/>
                         
