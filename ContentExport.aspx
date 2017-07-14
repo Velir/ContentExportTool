@@ -45,6 +45,11 @@
             margin-left: 5px;
         }
 
+        .include-ids {
+            color: brown;
+            font-size: 14px;
+        }
+
 	</style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script>
@@ -128,22 +133,25 @@
                         <div class="advanced-inner">
                             <span class="header">Image Fields</span><br/>
                             <span class="notes">Enter field names separated by commas</span><br/>
-                            <textarea runat="server" ID="inputImageFields" cols="40" rows="10"></textarea>
+                            <textarea runat="server" ID="inputImageFields" cols="40" rows="10"></textarea><br/>
+                            <asp:Checkbox runat="server" ID="chkIncludeImageIds" /><span class="include-ids">Include image ID</span>
                             <br /><br/>
                     
                             <span class="header">Link Fields</span><br/>
                             <span class="notes">Enter field names separated by commas</span><br/>
-                            <textarea runat="server" ID="inputLinkFields" cols="40" rows="10"></textarea>
+                            <textarea runat="server" ID="inputLinkFields" cols="40" rows="10"></textarea><br/>
                             <br /><br/>
                             
                             <span class="header">DropList Fields</span><br/>
                             <span class="notes">Enter field names separated by commas</span><br/>
-                            <textarea runat="server" ID="inputDroplistFields" cols="40" rows="10"></textarea>
+                            <textarea runat="server" ID="inputDroplistFields" cols="40" rows="10"></textarea><br/>
+                            <asp:Checkbox runat="server" ID="chkIncludeDroplistIds"/><span class="include-ids">Include selected item ID</span><br/>
                             <br /><br/>
                     
                             <span class="header">Multilist Fields</span><br/>
                             <span class="notes">Enter field names separated by commas</span><br/>
-                            <textarea runat="server" ID="inputMultiFields" cols="40" rows="10"></textarea>
+                            <textarea runat="server" ID="inputMultiFields" cols="40" rows="10"></textarea><br/>
+                            <asp:Checkbox runat="server" ID="chkIncludeMultilistIds" /><span class="include-ids">Include item IDs</span>
                             <br /><br/>
                             
                             <asp:CheckBox runat="server" CssClass="workflowBox" ID="chkWorkflowName"/><span class="header">Workflow</span><br/>

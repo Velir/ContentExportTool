@@ -112,6 +112,15 @@ namespace ContentExportTool {
         protected global::System.Web.UI.HtmlControls.HtmlTextArea inputImageFields;
         
         /// <summary>
+        /// chkIncludeImageIds control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkIncludeImageIds;
+        
+        /// <summary>
         /// inputLinkFields control.
         /// </summary>
         /// <remarks>
@@ -130,6 +139,15 @@ namespace ContentExportTool {
         protected global::System.Web.UI.HtmlControls.HtmlTextArea inputDroplistFields;
         
         /// <summary>
+        /// chkIncludeDroplistIds control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkIncludeDroplistIds;
+        
+        /// <summary>
         /// inputMultiFields control.
         /// </summary>
         /// <remarks>
@@ -137,6 +155,15 @@ namespace ContentExportTool {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlTextArea inputMultiFields;
+        
+        /// <summary>
+        /// chkIncludeMultilistIds control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkIncludeMultilistIds;
         
         /// <summary>
         /// chkWorkflowName control.

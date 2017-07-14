@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Glass.Sitecore.Mapper;
 using Sitecore.Data;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
-using Field = Sitecore.Forms.Data.Field;
 
 namespace ContentExportTool
 {
@@ -79,6 +77,9 @@ namespace ContentExportTool
                 var droplistFields = droplistFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
 
                 var includeIds = chkIncludeIds.Checked;
+                var includeImageIds = chkIncludeImageIds.Checked;
+                var includeDroplistIds = chkIncludeDroplistIds.Checked;
+                var includeMultilistIds = chkIncludeMultilistIds.Checked;
 
                 var startNode = inputStartitem.Value;
                 if (String.IsNullOrEmpty(startNode)) startNode = "/sitecore/content";
@@ -116,11 +117,11 @@ namespace ContentExportTool
                 using (StringWriter sw = new StringWriter())
                 {
                     var headingString = "Item\t" + (includeIds ? "Item ID (guid)\t" : string.Empty) 
-                    + fields.Aggregate("", (current, field) => current + (field + "\t"))
-                    + imageFields.Aggregate("", (current, field) => current + (field + "\t"))
-                    + linkFields.Aggregate("", (current, field) => current + (field + "\t"))
-                    + droplistFields.Aggregate("", (current, field) => current + (field + "\t"))
-                    + multiFields.Aggregate("", (current, field) => current + (field + "\t"))
+                    + GetExcelHeaderForFields(fields, false)
+                    + GetExcelHeaderForFields(imageFields, includeImageIds)
+                    + GetExcelHeaderForFields(linkFields, false)
+                    + GetExcelHeaderForFields(droplistFields, includeDroplistIds)
+                    + GetExcelHeaderForFields(multiFields, includeMultilistIds)
                     + (includeworkflowName ? "Workflow\t" : string.Empty)
                     + (includeWorkflowState ? "Workflow State\t" : string.Empty );
                     sw.WriteLine(headingString);
@@ -159,15 +160,28 @@ namespace ContentExportTool
                                 if (itemField == null)
                                 {
                                     itemLine += "n/a\t";
+
+                                    if (includeImageIds)
+                                    {
+                                        itemLine += "n/a\t";
+                                    }
                                 }
                                 else if (itemField.MediaItem == null)
                                 {
 
                                     itemLine += "\t";
+                                    if (includeImageIds)
+                                    {
+                                        itemLine += "\t";
+                                    }
                                 }
                                 else
                                 {
                                     itemLine += itemField.MediaItem.Paths.MediaPath + "\t";
+                                    if (includeImageIds)
+                                    {
+                                        itemLine += itemField.MediaItem.ID + "\t";
+                                    }
                                 }
                             }
                         }
@@ -194,14 +208,26 @@ namespace ContentExportTool
                             if (fieldLink == null)
                             {
                                 itemLine += "n/a\t";
+                                if (includeDroplistIds)
+                                {
+                                    itemLine += "n/a\t";
+                                }
                             }
                             else if (fieldLink.TargetItem == null)
                             {
                                 itemLine += "\t";
+                                if (includeDroplistIds)
+                                {
+                                    itemLine += "\t";
+                                }
                             }
                             else
                             {
                                itemLine += fieldLink.TargetItem.DisplayName + "\t";
+                                if (includeDroplistIds)
+                                {
+                                    itemLine += fieldLink.TargetID + "\t";
+                                }
                             }
                         }
 
@@ -213,6 +239,10 @@ namespace ContentExportTool
                                 if (itemField == null)
                                 {
                                     itemLine += "n/a\t";
+                                    if (includeMultilistIds)
+                                    {
+                                        itemLine += "n/a\t";
+                                    }
                                 }
                                 else
                                 {
@@ -228,8 +258,24 @@ namespace ContentExportTool
                                         var url = i.Paths.ContentPath;
                                         data += url + ";";
                                         first = false;
-                                    }
+                                    }                                   
                                     itemLine += "\"" + data + "\"" + "\t";
+
+                                    if (includeMultilistIds)
+                                    {
+                                        first = true;
+                                        var idData = "";
+                                        foreach (var i in multiItems)
+                                        {
+                                            if (!first)
+                                            {
+                                                idData += "\n";
+                                            }
+                                            idData += i.ID + ";";
+                                            first = false;
+                                        }
+                                        itemLine += "\"" + idData + "\"" + "\t";
+                                    }
                                 }
                             }
                         }
@@ -289,6 +335,20 @@ namespace ContentExportTool
             {
                 litFeedback.Text = ex.Message;
             }
+        }
+
+        public string GetExcelHeaderForFields(IEnumerable<string> fields, bool includeId)
+        {
+            var header = "";
+            foreach (var field in fields)
+            {
+                header += field + "\t";
+                if (includeId)
+                {
+                    header += String.Format("{0} ID", field) + "\t";
+                }
+            }
+            return header;
         }
 
         public string RemoveLineEndings(string value)
