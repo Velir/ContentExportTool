@@ -135,6 +135,11 @@
                             <span class="notes">Enter field names separated by commas</span><br/>
                             <textarea runat="server" ID="inputLinkFields" cols="40" rows="10"></textarea>
                             <br /><br/>
+                            
+                            <span class="header">DropList Fields</span><br/>
+                            <span class="notes">Enter field names separated by commas</span><br/>
+                            <textarea runat="server" ID="inputDroplistFields" cols="40" rows="10"></textarea>
+                            <br /><br/>
                     
                             <span class="header">Multilist Fields</span><br/>
                             <span class="notes">Enter field names separated by commas</span><br/>

@@ -121,6 +121,15 @@ namespace ContentExportTool {
         protected global::System.Web.UI.HtmlControls.HtmlTextArea inputLinkFields;
         
         /// <summary>
+        /// inputDroplistFields control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTextArea inputDroplistFields;
+        
+        /// <summary>
         /// inputMultiFields control.
         /// </summary>
         /// <remarks>

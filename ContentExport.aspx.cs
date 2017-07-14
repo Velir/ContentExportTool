@@ -38,6 +38,7 @@ namespace ContentExportTool
                 var imageFieldString = inputImageFields.Value;
                 var linkFieldString = inputLinkFields.Value;
                 var multiFieldString = inputMultiFields.Value;
+                var droplistFieldString = inputDroplistFields.Value;
 
                 var databaseName = ddDatabase.SelectedValue;
                 if (databaseName == "custom")
@@ -74,7 +75,8 @@ namespace ContentExportTool
                 var fields = fieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
                 var imageFields = imageFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
                 var linkFields = linkFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
-                var multiFields = multiFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));                
+                var multiFields = multiFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));  
+                var droplistFields = droplistFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
 
                 var includeIds = chkIncludeIds.Checked;
 
@@ -117,6 +119,7 @@ namespace ContentExportTool
                     + fields.Aggregate("", (current, field) => current + (field + "\t"))
                     + imageFields.Aggregate("", (current, field) => current + (field + "\t"))
                     + linkFields.Aggregate("", (current, field) => current + (field + "\t"))
+                    + droplistFields.Aggregate("", (current, field) => current + (field + "\t"))
                     + multiFields.Aggregate("", (current, field) => current + (field + "\t"))
                     + (includeworkflowName ? "Workflow\t" : string.Empty)
                     + (includeWorkflowState ? "Workflow State\t" : string.Empty );
@@ -182,6 +185,23 @@ namespace ContentExportTool
                                 {
                                     itemLine += itemField.Url + "\t";
                                 }
+                            }
+                        }
+
+                        foreach (var field in droplistFields)
+                        {
+                            ReferenceField fieldLink = item.Fields[field];
+                            if (fieldLink == null)
+                            {
+                                itemLine += "n/a\t";
+                            }
+                            else if (fieldLink.TargetItem == null)
+                            {
+                                itemLine += "\t";
+                            }
+                            else
+                            {
+                               itemLine += fieldLink.TargetItem.DisplayName + "\t";
                             }
                         }
 
