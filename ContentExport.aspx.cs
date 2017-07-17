@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Sitecore.Data;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
@@ -65,11 +66,6 @@ namespace ContentExportTool
                     return;
                 }
 
-                //if (CheckIfValidSelection())
-                //{
-                //    litFeedback.Text = "No options selected. You";
-                //    return;
-                //}
                 var fields = fieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
                 var imageFields = imageFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
                 var linkFields = linkFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
@@ -81,21 +77,32 @@ namespace ContentExportTool
                 var includeDroplistIds = chkIncludeDroplistIds.Checked;
                 var includeMultilistIds = chkIncludeMultilistIds.Checked;
 
-                var allLanguages = chkAllLanguages.Checked;
+                var allLanguages = chkAllLanguages.Checked;               
+
+                var templateString = inputTemplates.Value;
+                templateString = Regex.Replace(templateString, @"\s+", string.Empty);
+                var templates = templateString.ToLower().Split(',').Select(x => x.Trim());
 
                 var startNode = inputStartitem.Value;
                 if (String.IsNullOrEmpty(startNode)) startNode = "/sitecore/content";
 
-                var templateString = inputTemplates.Value;
-                var templates = templateString.ToLower().Split(',').Select(x => x.Trim());
+                var fastQuery = txtFastQuery.Value;
 
-                Item startItem = _db.GetItem(startNode);
+                var exportItems = new List<Item>() { };
 
-                var exportItems = new List<Item>() {startItem};
-                var descendants = startItem.Axes.GetDescendants();
-
-                exportItems.AddRange(descendants);
-
+                if (!String.IsNullOrEmpty(fastQuery))
+                {
+                    var queryItems = _db.SelectItems(fastQuery);
+                    exportItems = queryItems.ToList();
+                }
+                else
+                {
+                    Item startItem = _db.GetItem(startNode);
+                    var descendants = startItem.Axes.GetDescendants();
+                    exportItems.Add(startItem);
+                    exportItems.AddRange(descendants);
+                }                              
+             
                 List<Item> items = new List<Item>();
                 if (!String.IsNullOrEmpty(templateString))
                 {
@@ -107,7 +114,7 @@ namespace ContentExportTool
                 }
                 else
                 {
-                    items = descendants.ToList();
+                    items = exportItems.ToList();
                 }
 
                 Response.Clear();
