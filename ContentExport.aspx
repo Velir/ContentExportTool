@@ -62,6 +62,11 @@
             margin-left: 6px;
         }
 
+        .lit-fast-query {
+            color: brown;
+            font-size: 12px;
+        }
+
 	</style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script>
@@ -101,6 +106,10 @@
                 var input = $("#" + id);
                 $(input).val("");
             });
+
+            $("#clear-fast-query").on("click", function() {
+                $(".lit-fast-query").html("");
+            });
         });
 
     </script>
@@ -132,9 +141,9 @@
                     <input runat="server" ID="inputStartitem"/>
                     <br/>
                     <span>OR</span><br/>
-                    <span class="header">Fast Query</span><a class="clear-btn" data-id="txtFastQuery">clear</a><br/>
+                    <span class="header">Fast Query</span><a class="clear-btn" id="clear-fast-query" data-id="txtFastQuery">clear</a><br/>
                     <span class="notes">Enter a fast query to run a filtered export. You can use the Templates box as well.<br/> Example: fast:/sitecore/content/Home//*[@__Updated >= '20140610' and @__Updated <'20140611']</span><br/>
-                    <input runat="server" ID="txtFastQuery"/>
+                    <input runat="server" ID="txtFastQuery"/> <asp:Button runat="server" ID="btnTestFastQuery" OnClick="btnTestFastQuery_OnClick" Text="Test"/> <span class="lit-fast-query"><asp:Literal runat="server" ID="litFastQueryTest"></asp:Literal></span>
                     <br/>
                    <br/>
                     

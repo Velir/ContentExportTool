@@ -29,37 +29,54 @@ namespace ContentExportTool
             base.OnInit(e);
         }
 
+        protected bool SetDatabase()
+        {
+            var databaseName = ddDatabase.SelectedValue;
+            if (chkWorkflowName.Checked || chkWorkflowState.Checked)
+            {
+                databaseName = "master";
+            }
+            else if (databaseName == "custom")
+            {
+                databaseName = txtCustomDatabase.Value;
+            }
+
+            if (String.IsNullOrEmpty(databaseName))
+            {
+                return false;
+            }
+
+            _db = Sitecore.Configuration.Factory.GetDatabase(databaseName);
+            return true;
+        }
+
+        protected void SetDatabase(string databaseName)
+        {
+            _db = Sitecore.Configuration.Factory.GetDatabase(databaseName);
+        }
+
         protected void btnRunExport_OnClick(object sender, EventArgs e)
         {
+            litFastQueryTest.Text = "";
+
             try
             {
                 var fieldString = inputFields.Value;
                 var imageFieldString = inputImageFields.Value;
                 var linkFieldString = inputLinkFields.Value;
                 var multiFieldString = inputMultiFields.Value;
-                var droplistFieldString = inputDroplistFields.Value;
-
-                var databaseName = ddDatabase.SelectedValue;
-                if (databaseName == "custom")
-                {
-                    databaseName = txtCustomDatabase.Value;
-                }
+                var droplistFieldString = inputDroplistFields.Value;              
 
                 var includeWorkflowState = chkWorkflowState.Checked;
                 var includeworkflowName = chkWorkflowName.Checked;
-
-                if (includeworkflowName || includeWorkflowState)
-                {
-                    databaseName = "master";
-                }
-
-                if (String.IsNullOrEmpty(databaseName))
+               
+                if (!SetDatabase())
                 {
                     litFeedback.Text = "You must enter a custom database name, or select a database from the dropdown";
                     return;
                 }
 
-                _db = Sitecore.Configuration.Factory.GetDatabase(databaseName);
+                
                 if (_db == null)
                 {
                     litFeedback.Text = "Invalid database. Selected database does not exist.";
@@ -442,12 +459,6 @@ namespace ContentExportTool
             return id.ToString().Replace("{", string.Empty).Replace("}", string.Empty).Replace("-", string.Empty);
         }
 
-        //protected bool CheckIfValidSelection()
-        //{
-        //    return String.IsNullOrEmpty(fieldString) && String.IsNullOrEmpty(imageFieldString) &&
-        //           String.IsNullOrEmpty(linkFieldString) && String.IsNullOrEmpty(multiFieldString);
-        //}
-
         protected string GetFieldLink(Item field)
         {
             ReferenceField fieldLink = field.Fields["Field Link"];
@@ -456,6 +467,32 @@ namespace ContentExportTool
             var val = fieldLink.TargetItem.DisplayName;
             var splitval = val.Split('/');
             return splitval[splitval.Length - 1];
+        }
+
+        protected void btnTestFastQuery_OnClick(object sender, EventArgs e)
+        {
+            if (!SetDatabase()) SetDatabase("web");
+
+            var fastQuery = txtFastQuery.Value;
+            if (String.IsNullOrEmpty(fastQuery)) return;
+
+            try
+            {
+                var results = _db.SelectItems(fastQuery);
+                if (results == null)
+                {
+                    litFastQueryTest.Text = "Query returned null";
+                }
+                else
+                {
+                    litFastQueryTest.Text = String.Format("Query returned {0} items", results.Length);
+                }
+            }
+            catch (Exception ex)
+            {
+                litFastQueryTest.Text = "Error: " + ex.Message;
+            }
+            
         }
     }
 }
