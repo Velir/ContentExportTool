@@ -97,7 +97,6 @@ namespace ContentExportTool
                 var allLanguages = chkAllLanguages.Checked;               
 
                 var templateString = inputTemplates.Value;
-                templateString = Regex.Replace(templateString, @"\s+", string.Empty);
                 var templates = templateString.ToLower().Split(',').Select(x => x.Trim());
 
                 var startNode = inputStartitem.Value;
@@ -191,7 +190,7 @@ namespace ContentExportTool
                             {
                                 if (!String.IsNullOrEmpty(field))
                                 {
-                                    var itemField = item.Fields[field];
+                                    var itemField = item.Fields[GetFieldIDOrName(field)];
                                     if (itemField == null)
                                     {
                                         itemLine += "n/a\t";
@@ -207,7 +206,7 @@ namespace ContentExportTool
                             {
                                 if (!string.IsNullOrEmpty(field))
                                 {
-                                    ImageField itemField = item.Fields[field];
+                                    ImageField itemField = item.Fields[GetFieldIDOrName(field)];
                                     if (itemField == null)
                                     {
                                         itemLine += "n/a\t";
@@ -241,7 +240,7 @@ namespace ContentExportTool
                             {
                                 if (!string.IsNullOrEmpty(field))
                                 {
-                                    LinkField itemField = item.Fields[field];
+                                    LinkField itemField = item.Fields[GetFieldIDOrName(field)];
                                     if (itemField == null)
                                     {
                                         itemLine += "n/a\t";
@@ -255,7 +254,7 @@ namespace ContentExportTool
 
                             foreach (var field in droplistFields)
                             {
-                                ReferenceField fieldLink = item.Fields[field];
+                                ReferenceField fieldLink = item.Fields[GetFieldIDOrName(field)];
                                 if (fieldLink == null)
                                 {
                                     itemLine += "n/a\t";
@@ -286,7 +285,7 @@ namespace ContentExportTool
                             {
                                 if (!string.IsNullOrEmpty(field))
                                 {
-                                    MultilistField itemField = item.Fields[field];
+                                    MultilistField itemField = item.Fields[GetFieldIDOrName(field)];
                                     if (itemField == null)
                                     {
                                         itemLine += "n/a\t";
@@ -388,15 +387,35 @@ namespace ContentExportTool
             }
         }
 
+        public string GetFieldName(string field)
+        {
+            if (field.Split(':').Length > 1)
+            {
+                return field.Split(':')[1];
+            }
+            return field;
+        }
+
+        public string GetFieldIDOrName(string field)
+        {
+            if (field.Split(':').Length > 1)
+            {
+                return field.Split(':')[0];
+            }
+            return field;
+        }
+
         public string GetExcelHeaderForFields(IEnumerable<string> fields, bool includeId)
         {
             var header = "";
             foreach (var field in fields)
             {
-                header += field + "\t";
+                var fieldName = GetFieldName(field);
+
+                header += fieldName + "\t";
                 if (includeId)
                 {
-                    header += String.Format("{0} ID", field) + "\t";
+                    header += String.Format("{0} ID", fieldName) + "\t";
                 }
             }
             return header;

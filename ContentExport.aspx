@@ -5,9 +5,19 @@
 <head runat="server">
     <title>Content Export Tool</title>
     <style>
-		.header {color: brown}
-		.notes {color: GrayText; font-size: 12px}
-		.container {margin-bottom: 10px; font-family: Arial}
+        .header {
+            color: brown;
+        }
+
+        .notes {
+            color: GrayText;
+            font-size: 12px;
+        }
+
+        .container {
+            margin-bottom: 10px;
+            font-family: Arial;
+        }
 
         .advanced .advanced-inner {
             display: none;
@@ -18,27 +28,27 @@
             color: brown;
             font-weight: bold;
             padding-bottom: 10px;
-            cursor:pointer;
+            cursor: pointer;
         }
 
-        .advanced .advanced-btn:after {
-            border-style: solid;
-	        border-width: 0.25em 0.25em 0 0;
-	        content: '';
-	        display: inline-block;
-	        height: 0.45em;
-	        left: 0.15em;
-	        position: relative;
-	        vertical-align: top;
-	        width: 0.45em;
-	        top: 0;
-	        transform: rotate(135deg);
-	        margin-left:5px
-        }
+            .advanced .advanced-btn:after {
+                border-style: solid;
+                border-width: 0.25em 0.25em 0 0;
+                content: '';
+                display: inline-block;
+                height: 0.45em;
+                left: 0.15em;
+                position: relative;
+                vertical-align: top;
+                width: 0.45em;
+                top: 0;
+                transform: rotate(135deg);
+                margin-left: 5px;
+            }
 
         .advanced.open a.advanced-btn:after {
             top: 0.3em;
-	        transform: rotate(-45deg);
+            transform: rotate(-45deg);
         }
 
         .txtCustomDatabase {
@@ -55,11 +65,16 @@
             max-width: 80%;
         }
 
-        a.clear-btn {
+        a.clear-btn, .show-hints {
             cursor: pointer;
             color: brown;
             font-size: 11px;
             margin-left: 6px;
+        }
+
+        .show-hints {
+            margin-left: 0;
+            display: block;
         }
 
         .lit-fast-query {
@@ -67,11 +82,17 @@
             font-size: 12px;
         }
 
-	</style>
+        .hints .notes {
+            display: block;
+            display: none;
+            width: 750px;
+            max-width: 80%;
+        }
+    </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $(".advanced-btn").on("click", function() {
+        $(document).ready(function () {
+            $(".advanced-btn").on("click", function () {
                 if ($(this).parent().hasClass("open")) {
                     $(this).parent().removeClass("open");
                 } else {
@@ -81,7 +102,7 @@
                 $(".advanced-inner").slideToggle();
             });
 
-            $(".ddDatabase").on("change", function() {
+            $(".ddDatabase").on("change", function () {
                 if ($(this).find("option:selected").val() === "custom") {
                     $(".txtCustomDatabase").show();
                 } else {
@@ -89,7 +110,7 @@
                 }
 
                 if ($(this).find("option:selected").val() !== "master") {
-                    $(".workflowBox input").each(function() {
+                    $(".workflowBox input").each(function () {
                         $(this).prop("checked", false);
                     });
                 }
@@ -101,14 +122,18 @@
                 }
             });
 
-            $(".clear-btn").on("click", function() {
+            $(".clear-btn").on("click", function () {
                 var id = $(this).attr("data-id");
                 var input = $("#" + id);
                 $(input).val("");
             });
 
-            $("#clear-fast-query").on("click", function() {
+            $("#clear-fast-query").on("click", function () {
                 $(".lit-fast-query").html("");
+            });
+
+            $(".show-hints").on("click", function () {
+                $(this).next(".notes").slideToggle();
             });
         });
 
@@ -116,7 +141,7 @@
 
 </head>
 <body>
-   <form id="form1" runat="server">
+    <form id="form1" runat="server">
         <div>
             <h2 id="headline" runat="server">Content Export Tool</h2>
 
@@ -124,88 +149,138 @@
                 <asp:Literal runat="server" ID="litFeedback"></asp:Literal>
             </div>
 
-            <div class="controls">                              
-                <asp:Button runat="server" ID="btnRunExport" OnClick="btnRunExport_OnClick" Text="Run Export"/><br/><br/>
+            <div class="controls">
+                <asp:Button runat="server" ID="btnRunExport" OnClick="btnRunExport_OnClick" Text="Run Export" /><br />
+                <br />
 
                 <div class="container">
-                    
+
                     <span class="header">Database</span>
-                    <asp:DropDownList runat="server" ID="ddDatabase" CssClass="ddDatabase"/><input runat="server" class="txtCustomDatabase" ID="txtCustomDatabase" style="display:none"/> <br/>
-                    <span class="notes">Select database. Defaults to web</span><br/><br/>
-                    
-                    <asp:Checkbox runat="server" ID="chkIncludeIds"/><span class="header">Include IDs</span><br/>
-                    <span class="notes">Check this box to include item IDs (guid) in the exported file. Item paths are already included.</span><br/><br/>
+                    <asp:DropDownList runat="server" ID="ddDatabase" CssClass="ddDatabase" /><input runat="server" class="txtCustomDatabase" id="txtCustomDatabase" style="display: none" />
+                    <br />
+                    <span class="notes">Select database. Defaults to web</span><br />
+                    <br />
 
-                    <span class="header">Start Item</span><a class="clear-btn" data-id="inputStartitem">clear</a><br/>
-                     <span class="notes">Enter the path of the starting node. Only content beneath and including this node will be exported. If field is left blank, the starting node will be /sitecore/content</span><br/>
-                    <input runat="server" ID="inputStartitem"/>
-                    <br/>
-                    <span>OR</span><br/>
-                    <span class="header">Fast Query</span><a class="clear-btn" id="clear-fast-query" data-id="txtFastQuery">clear</a><br/>
-                    <span class="notes">Enter a fast query to run a filtered export. You can use the Templates box as well.<br/> Example: fast:/sitecore/content/Home//*[@__Updated >= '20140610' and @__Updated <'20140611']</span><br/>
-                    <input runat="server" ID="txtFastQuery"/> <asp:Button runat="server" ID="btnTestFastQuery" OnClick="btnTestFastQuery_OnClick" Text="Test"/> <span class="lit-fast-query"><asp:Literal runat="server" ID="litFastQueryTest"></asp:Literal></span>
-                    <br/>
-                   <br/>
-                    
-                    <span class="header">Templates</span><a class="clear-btn" data-id="inputTemplates">clear</a><br/>
-                     <span class="notes">Enter template names separated by commas. Items will only be exported if their template name is in this list. If this field is left blank, all templates will be exported</span><br/>
-                    <textarea runat="server" ID="inputTemplates" cols="60" row="5"></textarea>
-                    <br/>
-                   <br/>
+                    <asp:CheckBox runat="server" ID="chkIncludeIds" /><span class="header">Include IDs</span><br />
+                    <span class="notes">Check this box to include item IDs (guid) in the exported file. Item paths are already included.</span><br />
+                    <br />
 
-                    <span class="header">Text Fields</span><a class="clear-btn" data-id="inputFields">clear</a><br/>
-                    <span class="notes">Enter field names separated by commas</span><br/>
-                    <textarea runat="server" ID="inputFields" cols="60" row="5"></textarea>
-                    <br /><br/>
-                    
-                    
-                    
-                    
+                    <span class="header">Start Item</span><a class="clear-btn" data-id="inputStartitem">clear</a><br />
+                    <span class="notes">Enter the path or ID of the starting node. Only content beneath and including this node will be exported. If field is left blank, the starting node will be /sitecore/content</span><br />
+                    <input runat="server" id="inputStartitem" />
+                    <br />
+                    <span>OR</span><br />
+                    <span class="header">Fast Query</span><a class="clear-btn" id="clear-fast-query" data-id="txtFastQuery">clear</a><br />
+                    <span class="notes">Enter a fast query to run a filtered export. You can use the Templates box as well.<br />
+                        Example: fast:/sitecore/content/Home//*[@__Updated >= '20140610' and @__Updated <'20140611']</span><br />
+                    <input runat="server" id="txtFastQuery" />
+                    <asp:Button runat="server" ID="btnTestFastQuery" OnClick="btnTestFastQuery_OnClick" Text="Test" />
+                    <span class="lit-fast-query">
+                        <asp:Literal runat="server" ID="litFastQueryTest"></asp:Literal></span>
+                    <br />
+                    <br />
+
+                    <span class="header">Templates</span><a class="clear-btn" data-id="inputTemplates">clear</a><br />
+                    <span class="notes">Enter template names separated by commas. Items will only be exported if their template name is in this list. If this field is left blank, all templates will be exported</span><br />
+                    <textarea runat="server" id="inputTemplates" cols="60" row="5"></textarea>
+                    <br />
+                    <div class="hints">
+                        <a class="show-hints">Hints</a>
+                        <span class="notes">This field is only for Template Names. To use Template IDs instead, use the Template IDs box in the Advanced section.
+                        </span>
+                    </div>
+                    <br />
+
+                    <span class="header">Text Fields</span><a class="clear-btn" data-id="inputFields">clear</a><br />
+                    <span class="notes">Enter field names separated by commas</span><br />
+                    <textarea runat="server" id="inputFields" cols="60" row="5"></textarea>
+                    <div class="hints">
+                        <a class="show-hints">Hints</a>
+                        <span class="notes">You can alternately enter field IDs instead of field Names. This is useful if an item has multiple fields with the same name. If you just enter the field ID, the header in the CVS will be the field ID. To search by ID and output the field name in the CSV, use the following format:
+                            <br />
+                            {00000000-0000-0000-0000-000000000000}:FieldName
+                        </span>
+                    </div>
+                    <br />
+
+
+
+
                     <div class="advanced">
                         <a class="advanced-btn">Advanced Fields</a>
                         <div class="advanced-inner">
-                            <span class="header">Image Fields</span><a class="clear-btn" data-id="inputImageFields">clear</a><br/>
-                            <span class="notes">Enter field names separated by commas</span><br/>
-                            <textarea runat="server" ID="inputImageFields" cols="60" row="5"></textarea><br/>
-                            <asp:Checkbox runat="server" ID="chkIncludeImageIds" /><span class="include-ids">Include image ID</span>
-                            <br /><br/>
-                    
-                            <span class="header">Link Fields</span><a class="clear-btn" data-id="inputLinkFields">clear</a><br/>
-                            <span class="notes">Enter field names separated by commas</span><br/>
-                            <textarea runat="server" ID="inputLinkFields" cols="60" row="5"></textarea><br/>
-                            <br /><br/>
-                            
-                            <span class="header">DropList Fields</span><a class="clear-btn" data-id="inputDroplistFields">clear</a><br/>
-                            <span class="notes">Enter field names separated by commas</span><br/>
-                            <textarea runat="server" ID="inputDroplistFields" cols="60" row="5"></textarea><br/>
-                            <asp:Checkbox runat="server" ID="chkIncludeDroplistIds"/><span class="include-ids">Include selected item ID</span><br/>
-                            <br /><br/>
-                    
-                            <span class="header">Multilist Fields</span><a class="clear-btn" data-id="inputMultiFields">clear</a><br/>
-                            <span class="notes">Enter field names separated by commas</span><br/>
-                            <textarea runat="server" ID="inputMultiFields" cols="60" row="5"></textarea><br/>
-                            <asp:Checkbox runat="server" ID="chkIncludeMultilistIds" /><span class="include-ids">Include item IDs</span>
-                            <br /><br/>
-                            
-                            <asp:CheckBox runat="server" CssClass="workflowBox" ID="chkWorkflowName"/><span class="header">Workflow</span><br/>
-                            <asp:CheckBox runat="server" CssClass="workflowBox" ID="chkWorkflowState"/><span class="header">Workflow State</span>  <br />
-                            <span class="notes">Workflow options require the database to be set to master</span>
-                            <br/><br/>
+                            <span class="header">Image Fields</span><a class="clear-btn" data-id="inputImageFields">clear</a><br />
+                            <span class="notes">Enter field names separated by commas</span><br />
+                            <textarea runat="server" id="inputImageFields" cols="60" row="5"></textarea><br />
+                            <asp:CheckBox runat="server" ID="chkIncludeImageIds" /><span class="include-ids">Include image ID</span>
+                            <div class="hints">
+                                <a class="show-hints">Hints</a>
+                                <span class="notes">You can alternately enter field IDs instead of field Names. This is useful if an item has multiple fields with the same name. If you just enter the field ID, the header in the CVS will be the field ID. To search by ID and output the field name in the CSV, use the following format:
+                                    <br />
+                                    {00000000-0000-0000-0000-000000000000}:FieldName
+                                </span>
+                            </div>
+                            <br />
 
-                            <asp:CheckBox runat="server" ID="chkAllLanguages"/><span class="header">Get All Language Versions</span><br/>
+                            <span class="header">Link Fields</span><a class="clear-btn" data-id="inputLinkFields">clear</a><br />
+                            <span class="notes">Enter field names separated by commas</span><br />
+                            <textarea runat="server" id="inputLinkFields" cols="60" row="5"></textarea>
+                            <div class="hints">
+                                <a class="show-hints">Hints</a>
+                                <span class="notes">You can alternately enter field IDs instead of field Names. This is useful if an item has multiple fields with the same name. If you just enter the field ID, the header in the CVS will be the field ID. To search by ID and output the field name in the CSV, use the following format:
+                                    <br />
+                                    {00000000-0000-0000-0000-000000000000}:FieldName
+                                </span>
+                            </div>
+                            <br />
+
+                            <span class="header">DropList Fields</span><a class="clear-btn" data-id="inputDroplistFields">clear</a><br />
+                            <span class="notes">Enter field names separated by commas</span><br />
+                            <textarea runat="server" id="inputDroplistFields" cols="60" row="5"></textarea><br />
+                            <asp:CheckBox runat="server" ID="chkIncludeDroplistIds" /><span class="include-ids">Include selected item ID</span>
+                            <div class="hints">
+                                <a class="show-hints">Hints</a>
+                                <span class="notes">You can alternately enter field IDs instead of field Names. This is useful if an item has multiple fields with the same name. If you just enter the field ID, the header in the CVS will be the field ID. To search by ID and output the field name in the CSV, use the following format:
+                                    <br />
+                                    {00000000-0000-0000-0000-000000000000}:FieldName
+                                </span>
+                            </div>
+                            <br />
+
+                            <span class="header">Multilist Fields</span><a class="clear-btn" data-id="inputMultiFields">clear</a><br />
+                            <span class="notes">Enter field names separated by commas</span><br />
+                            <textarea runat="server" id="inputMultiFields" cols="60" row="5"></textarea><br />
+                            <asp:CheckBox runat="server" ID="chkIncludeMultilistIds" /><span class="include-ids">Include item IDs</span>
+                            <div class="hints">
+                                <a class="show-hints">Hints</a>
+                                <span class="notes">You can alternately enter field IDs instead of field Names. This is useful if an item has multiple fields with the same name. If you just enter the field ID, the header in the CVS will be the field ID. To search by ID and output the field name in the CSV, use the following format:
+                                    <br />
+                                    {00000000-0000-0000-0000-000000000000}:FieldName
+                                </span>
+                            </div>
+                            <br />
+
+                            <asp:CheckBox runat="server" CssClass="workflowBox" ID="chkWorkflowName" /><span class="header">Workflow</span><br />
+                            <asp:CheckBox runat="server" CssClass="workflowBox" ID="chkWorkflowState" /><span class="header">Workflow State</span>
+                            <br />
+                            <span class="notes">Workflow options require the database to be set to master</span>
+                            <br />
+
+                            <asp:CheckBox runat="server" ID="chkAllLanguages" /><span class="header">Get All Language Versions</span><br />
                             <span class="notes">This will get the selected field values for all languages that each item has an existing version for</span>
-                            <br/><br/>
-                            
-                            <asp:Button runat="server" ID="btnRunExportDupe" OnClick="btnRunExport_OnClick" Text="Run Export"/><br/><br/>
-                        
-                            <asp:Button runat="server" ID="btnWebformsExport" OnClick="btnWebformsExport_OnClick" Text="Webforms" /><br/>
+                            <br />
+
+                            <asp:Button runat="server" ID="btnRunExportDupe" OnClick="btnRunExport_OnClick" Text="Run Export" /><br />
+                            <br />
+
+                            <asp:Button runat="server" ID="btnWebformsExport" OnClick="btnWebformsExport_OnClick" Text="Webforms" /><br />
                             <span class="notes">Download all Webforms for Marketers forms and fields</span>
                         </div>
                     </div>
-                    
+
                 </div>
-                
-                
+
+
             </div>
 
         </div>
