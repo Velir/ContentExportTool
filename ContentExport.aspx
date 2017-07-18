@@ -181,12 +181,12 @@
                     <br />
 
                     <span class="header">Templates</span><a class="clear-btn" data-id="inputTemplates">clear</a><br />
-                    <span class="notes">Enter template names separated by commas. Items will only be exported if their template name is in this list. If this field is left blank, all templates will be exported</span><br />
+                    <span class="notes">Enter template names and/or IDs separated by commas. Items will only be exported if their template is in this list. If this field is left blank, all templates will be included</span><br />
                     <textarea runat="server" id="inputTemplates" cols="60" row="5"></textarea>
                     <br />
                     <div class="hints">
                         <a class="show-hints">Hints</a>
-                        <span class="notes">This field is only for Template Names. To use Template IDs instead, use the Template IDs box in the Advanced section.
+                        <span class="notes">Example: Standard Page, {12345678-901-2345-6789-012345678901}
                         </span>
                     </div>
                     <br />
@@ -209,6 +209,7 @@
                     <div class="advanced">
                         <a class="advanced-btn">Advanced Fields</a>
                         <div class="advanced-inner">
+
                             <span class="header">Image Fields</span><a class="clear-btn" data-id="inputImageFields">clear</a><br />
                             <span class="notes">Enter field names separated by commas</span><br />
                             <textarea runat="server" id="inputImageFields" cols="60" row="5"></textarea><br />

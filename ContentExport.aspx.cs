@@ -124,7 +124,7 @@ namespace ContentExportTool
                 {
                     foreach (var template in templates)
                     {
-                        var templateItems = exportItems.Where(x => x.TemplateName.ToLower() == template);
+                        var templateItems = exportItems.Where(x => x.TemplateName.ToLower() == template || x.TemplateID.ToString().ToLower().Replace("{", string.Empty).Replace("}", string.Empty) == template.Replace("{", string.Empty).Replace("}", string.Empty));
                         items.AddRange(templateItems);
                     }
                 }
@@ -430,7 +430,7 @@ namespace ContentExportTool
             string lineSeparator = ((char)0x2028).ToString();
             string paragraphSeparator = ((char)0x2029).ToString();
 
-            return value.Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty).Replace(lineSeparator, string.Empty).Replace(paragraphSeparator, string.Empty).Replace("<br/>", string.Empty).Replace("<br />", string.Empty);
+            return value.Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty).Replace(lineSeparator, string.Empty).Replace(paragraphSeparator, string.Empty).Replace("<br/>", string.Empty).Replace("<br />", string.Empty).Replace("\t", "   ");
         }
 
         protected void btnWebformsExport_OnClick(object sender, EventArgs e)
