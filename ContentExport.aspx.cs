@@ -93,6 +93,8 @@ namespace ContentExportTool
                 var includeImageIds = chkIncludeImageIds.Checked;
                 var includeDroplistIds = chkIncludeDroplistIds.Checked;
                 var includeMultilistIds = chkIncludeMultilistIds.Checked;
+                var includeRawImages = chkIncludeRawImages.Checked;
+                var includeRawLinks = chkIncludeRawLinks.Checked;
 
                 var allLanguages = chkAllLanguages.Checked;               
 
@@ -144,8 +146,8 @@ namespace ContentExportTool
                     var headingString = "Item\t" + (includeIds ? "Item ID (guid)\t" : string.Empty) 
                     + (allLanguages ? "Language\t" : string.Empty)
                     + GetExcelHeaderForFields(fields, false)
-                    + GetExcelHeaderForFields(imageFields, includeImageIds)
-                    + GetExcelHeaderForFields(linkFields, false)
+                    + GetExcelHeaderForFields(imageFields, includeImageIds, includeRawImages)
+                    + GetExcelHeaderForFields(linkFields, false, includeRawLinks)
                     + GetExcelHeaderForFields(droplistFields, includeDroplistIds)
                     + GetExcelHeaderForFields(multiFields, includeMultilistIds)
                     + (includeworkflowName ? "Workflow\t" : string.Empty)
@@ -215,12 +217,22 @@ namespace ContentExportTool
                                         {
                                             itemLine += "n/a\t";
                                         }
+
+                                        if (includeRawImages)
+                                        {
+                                            itemLine += "n/a\t";
+                                        }
                                     }
                                     else if (itemField.MediaItem == null)
                                     {
 
                                         itemLine += "\t";
                                         if (includeImageIds)
+                                        {
+                                            itemLine += "\t";
+                                        }
+
+                                        if (includeRawImages)
                                         {
                                             itemLine += "\t";
                                         }
@@ -231,6 +243,11 @@ namespace ContentExportTool
                                         if (includeImageIds)
                                         {
                                             itemLine += itemField.MediaItem.ID + "\t";
+                                        }
+
+                                        if (includeRawImages)
+                                        {
+                                            itemLine += itemField.Value + "\t";
                                         }
                                     }
                                 }
@@ -244,10 +261,20 @@ namespace ContentExportTool
                                     if (itemField == null)
                                     {
                                         itemLine += "n/a\t";
+
+                                        if (includeRawLinks)
+                                        {
+                                            itemLine += "n/a\t";
+                                        }
                                     }
                                     else
                                     {
                                         itemLine += itemField.Url + "\t";
+
+                                        if (includeRawLinks)
+                                        {
+                                            itemLine += itemField.Value + "\t";
+                                        }
                                     }
                                 }
                             }
@@ -405,7 +432,7 @@ namespace ContentExportTool
             return field;
         }
 
-        public string GetExcelHeaderForFields(IEnumerable<string> fields, bool includeId)
+        public string GetExcelHeaderForFields(IEnumerable<string> fields, bool includeId = false, bool includeRaw = false)
         {
             var header = "";
             foreach (var field in fields)
@@ -416,6 +443,11 @@ namespace ContentExportTool
                 if (includeId)
                 {
                     header += String.Format("{0} ID", fieldName) + "\t";
+                }
+
+                if (includeRaw)
+                {
+                    header += String.Format("{0} HTML", fieldName) + "\t";
                 }
             }
             return header;

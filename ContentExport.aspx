@@ -214,6 +214,7 @@
                             <span class="notes">Enter field names separated by commas</span><br />
                             <textarea runat="server" id="inputImageFields" cols="60" row="5"></textarea><br />
                             <asp:CheckBox runat="server" ID="chkIncludeImageIds" /><span class="include-ids">Include image ID</span>
+                            <asp:CheckBox runat="server" ID="chkIncludeRawImages"/><span class="include-ids">Include raw image HTML</span>
                             <div class="hints">
                                 <a class="show-hints">Hints</a>
                                 <span class="notes">You can alternately enter field IDs instead of field Names. This is useful if an item has multiple fields with the same name. If you just enter the field ID, the header in the CVS will be the field ID. To search by ID and output the field name in the CSV, use the following format:
@@ -225,7 +226,8 @@
 
                             <span class="header">Link Fields</span><a class="clear-btn" data-id="inputLinkFields">clear</a><br />
                             <span class="notes">Enter field names separated by commas</span><br />
-                            <textarea runat="server" id="inputLinkFields" cols="60" row="5"></textarea>
+                            <textarea runat="server" id="inputLinkFields" cols="60" row="5"></textarea><br/>
+                            <asp:CheckBox runat="server" ID="chkIncludeRawLinks"/><span class="include-ids">Include raw link HTML</span>
                             <div class="hints">
                                 <a class="show-hints">Hints</a>
                                 <span class="notes">You can alternately enter field IDs instead of field Names. This is useful if an item has multiple fields with the same name. If you just enter the field ID, the header in the CVS will be the field ID. To search by ID and output the field name in the CSV, use the following format:
@@ -265,11 +267,11 @@
                             <asp:CheckBox runat="server" CssClass="workflowBox" ID="chkWorkflowState" /><span class="header">Workflow State</span>
                             <br />
                             <span class="notes">Workflow options require the database to be set to master</span>
-                            <br />
+                            <br /><br/>
 
                             <asp:CheckBox runat="server" ID="chkAllLanguages" /><span class="header">Get All Language Versions</span><br />
                             <span class="notes">This will get the selected field values for all languages that each item has an existing version for</span>
-                            <br />
+                            <br /><br/>
 
                             <asp:Button runat="server" ID="btnRunExportDupe" OnClick="btnRunExport_OnClick" Text="Run Export" /><br />
                             <br />

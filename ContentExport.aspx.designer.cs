@@ -148,6 +148,15 @@ namespace ContentExportTool {
         protected global::System.Web.UI.WebControls.CheckBox chkIncludeImageIds;
         
         /// <summary>
+        /// chkIncludeRawImages control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkIncludeRawImages;
+        
+        /// <summary>
         /// inputLinkFields control.
         /// </summary>
         /// <remarks>
@@ -155,6 +164,15 @@ namespace ContentExportTool {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlTextArea inputLinkFields;
+        
+        /// <summary>
+        /// chkIncludeRawLinks control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkIncludeRawLinks;
         
         /// <summary>
         /// inputDroplistFields control.
