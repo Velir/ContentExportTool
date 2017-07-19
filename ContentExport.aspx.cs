@@ -65,7 +65,8 @@ namespace ContentExportTool
                 var imageFieldString = inputImageFields.Value;
                 var linkFieldString = inputLinkFields.Value;
                 var multiFieldString = inputMultiFields.Value;
-                var droplistFieldString = inputDroplistFields.Value;              
+                var droplistFieldString = inputDroplistFields.Value;
+                var checkboxFieldString = inputCheckboxFields.Value;           
 
                 var includeWorkflowState = chkWorkflowState.Checked;
                 var includeworkflowName = chkWorkflowName.Checked;
@@ -88,6 +89,7 @@ namespace ContentExportTool
                 var linkFields = linkFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
                 var multiFields = multiFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));  
                 var droplistFields = droplistFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
+                var checkboxFields = checkboxFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
 
                 var includeIds = chkIncludeIds.Checked;
                 var includeImageIds = chkIncludeImageIds.Checked;
@@ -150,6 +152,7 @@ namespace ContentExportTool
                     + GetExcelHeaderForFields(linkFields, false, includeRawLinks)
                     + GetExcelHeaderForFields(droplistFields, includeDroplistIds)
                     + GetExcelHeaderForFields(multiFields, includeMultilistIds)
+                    + GetExcelHeaderForFields(checkboxFields)
                     + (includeworkflowName ? "Workflow\t" : string.Empty)
                     + (includeWorkflowState ? "Workflow State\t" : string.Empty );
                     sw.WriteLine(headingString);
@@ -353,6 +356,22 @@ namespace ContentExportTool
                                             }
                                             itemLine += "\"" + idData + "\"" + "\t";
                                         }
+                                    }
+                                }
+                            }
+
+                            foreach (var field in checkboxFields)
+                            {
+                                if (!string.IsNullOrEmpty(field))
+                                {
+                                    CheckboxField itemField = item.Fields[field];
+                                    if (itemField == null)
+                                    {
+                                        itemLine += "n/a\t";
+                                    }
+                                    else
+                                    {
+                                        itemLine += itemField.Checked.ToString() + "\t";
                                     }
                                 }
                             }

@@ -211,6 +211,15 @@ namespace ContentExportTool {
         protected global::System.Web.UI.WebControls.CheckBox chkIncludeMultilistIds;
         
         /// <summary>
+        /// inputCheckboxFields control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTextArea inputCheckboxFields;
+        
+        /// <summary>
         /// chkWorkflowName control.
         /// </summary>
         /// <remarks>

@@ -227,6 +227,11 @@
                             <textarea runat="server" id="inputMultiFields" cols="60" row="5"></textarea><br />
                             <asp:CheckBox runat="server" ID="chkIncludeMultilistIds" /><span class="include-ids">Include item IDs</span>
                             <br /><br/>
+                            
+                            <span class="header">Checkbox Fields</span><a class="clear-btn" data-id="inputCheckboxFields">clear</a><br />
+                            <span class="notes">Enter field names or IDs separated by commas</span><br />
+                            <textarea runat="server" id="inputCheckboxFields" cols="60" row="5"></textarea><br />
+                            <br /><br/>
 
                             <asp:CheckBox runat="server" CssClass="workflowBox" ID="chkWorkflowName" /><span class="header">Workflow</span><br />
                             <asp:CheckBox runat="server" CssClass="workflowBox" ID="chkWorkflowState" /><span class="header">Workflow State</span>
