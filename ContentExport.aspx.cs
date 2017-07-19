@@ -192,7 +192,7 @@ namespace ContentExportTool
                             {
                                 if (!String.IsNullOrEmpty(field))
                                 {
-                                    var itemField = item.Fields[GetFieldIDOrName(field)];
+                                    var itemField = item.Fields[field];
                                     if (itemField == null)
                                     {
                                         itemLine += "n/a\t";
@@ -208,7 +208,7 @@ namespace ContentExportTool
                             {
                                 if (!string.IsNullOrEmpty(field))
                                 {
-                                    ImageField itemField = item.Fields[GetFieldIDOrName(field)];
+                                    ImageField itemField = item.Fields[field];
                                     if (itemField == null)
                                     {
                                         itemLine += "n/a\t";
@@ -257,7 +257,7 @@ namespace ContentExportTool
                             {
                                 if (!string.IsNullOrEmpty(field))
                                 {
-                                    LinkField itemField = item.Fields[GetFieldIDOrName(field)];
+                                    LinkField itemField = item.Fields[field];
                                     if (itemField == null)
                                     {
                                         itemLine += "n/a\t";
@@ -281,7 +281,7 @@ namespace ContentExportTool
 
                             foreach (var field in droplistFields)
                             {
-                                ReferenceField fieldLink = item.Fields[GetFieldIDOrName(field)];
+                                ReferenceField fieldLink = item.Fields[field];
                                 if (fieldLink == null)
                                 {
                                     itemLine += "n/a\t";
@@ -312,7 +312,7 @@ namespace ContentExportTool
                             {
                                 if (!string.IsNullOrEmpty(field))
                                 {
-                                    MultilistField itemField = item.Fields[GetFieldIDOrName(field)];
+                                    MultilistField itemField = item.Fields[field];
                                     if (itemField == null)
                                     {
                                         itemLine += "n/a\t";
@@ -414,22 +414,19 @@ namespace ContentExportTool
             }
         }
 
-        public string GetFieldName(string field)
+        public string GetFieldNameIfGuid(string field)
         {
-            if (field.Split(':').Length > 1)
+            Guid guid;
+            if (Guid.TryParse(field, out guid))
             {
-                return field.Split(':')[1];
+                var fieldItem = _db.GetItem(field);
+                if (fieldItem == null) return field;
+                return fieldItem.Name;
             }
-            return field;
-        }
-
-        public string GetFieldIDOrName(string field)
-        {
-            if (field.Split(':').Length > 1)
+            else
             {
-                return field.Split(':')[0];
+                return field;
             }
-            return field;
         }
 
         public string GetExcelHeaderForFields(IEnumerable<string> fields, bool includeId = false, bool includeRaw = false)
@@ -437,7 +434,7 @@ namespace ContentExportTool
             var header = "";
             foreach (var field in fields)
             {
-                var fieldName = GetFieldName(field);
+                var fieldName = GetFieldNameIfGuid(field);
 
                 header += fieldName + "\t";
                 if (includeId)
