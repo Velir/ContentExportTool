@@ -7,6 +7,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System.Web.UI.WebControls;
+using Glass.Mapper.Sc;
+
 namespace ContentExportTool {
     
     
@@ -38,7 +41,16 @@ namespace ContentExportTool {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal litFeedback;
-        
+
+        /// <summary>
+        /// litSitecoreContentTree control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litSitecoreContentTree;
+
         /// <summary>
         /// btnRunExport control.
         /// </summary>
@@ -74,7 +86,16 @@ namespace ContentExportTool {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox chkIncludeIds;
-        
+
+        /// <summary>
+        /// chkIncludeTemplate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkIncludeTemplate;
+
         /// <summary>
         /// inputStartitem control.
         /// </summary>
@@ -263,5 +284,7 @@ namespace ContentExportTool {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnWebformsExport;
+
+        protected global::System.Web.UI.WebControls.PlaceHolder PhBrowseTree;
     }
 }

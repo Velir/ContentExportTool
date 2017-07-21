@@ -1,13 +1,18 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ContentExport.aspx.cs" Inherits="ContentExportTool.ContentExport" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="ContentExport.aspx.cs" Inherits="ContentExportTool.ContentExport" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title>Content Export Tool</title>
     <style>
-        .header {
-            color: brown;
+        body {
+            background: white !important;
+            padding: 10px;
         }
+
+         .header {
+             color: brown;
+         }
 
         .notes {
             color: GrayText;
@@ -31,20 +36,20 @@
             cursor: pointer;
         }
 
-            .advanced .advanced-btn:after {
-                border-style: solid;
-                border-width: 0.25em 0.25em 0 0;
-                content: '';
-                display: inline-block;
-                height: 0.45em;
-                left: 0.15em;
-                position: relative;
-                vertical-align: top;
-                width: 0.45em;
-                top: 0;
-                transform: rotate(135deg);
-                margin-left: 5px;
-            }
+        .advanced .advanced-btn:after {
+            border-style: solid;
+            border-width: 0.25em 0.25em 0 0;
+            content: '';
+            display: inline-block;
+            height: 0.45em;
+            left: 0.15em;
+            position: relative;
+            vertical-align: top;
+            width: 0.45em;
+            top: 0;
+            transform: rotate(135deg);
+            margin-left: 5px;
+        }
 
         .advanced.open a.advanced-btn:after {
             top: 0.3em;
@@ -87,6 +92,53 @@
             display: none;
             width: 750px;
             max-width: 80%;
+        }
+
+        .browse-btn {
+            margin-left: 5px;
+        }
+
+        .modal.browse-modal {
+            z-index: 999;
+            position: absolute;
+            background: white;
+            border: 2px solid brown;
+            padding: 10px;
+            width: 500px;
+            margin-left: 20%;
+            height: 60%;
+            overflow: scroll;
+        }
+
+        .modal.browse-modal ul {
+            list-style: none;
+        }
+
+        .modal.browse-modal ul li {
+            position: relative;
+            left: -20px;
+        }       
+
+        .modal.browse-modal li ul {
+            display: none;
+        }
+
+        .modal.browse-modal li.expanded > ul {
+            display:block;
+        }
+
+        .modal.browse-modal a {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .modal.browse-modal .browse-expand {
+            color: brown;
+            position: absolute;
+        }
+
+        .modal.browse-modal .sitecore-node {
+            margin-left: 12px;
         }
     </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -134,8 +186,24 @@
 
             $(".show-hints").on("click", function () {
                 $(this).next(".notes").slideToggle();
-            });
+            });           
         });
+
+        function expandNode(node) {
+            if ($(node).parent().hasClass("expanded")) {
+
+                var children = $(node).parent().find("li");
+                $(children).removeClass("expanded");
+                var childBtns = $(node).parent().find(".browse-expand");
+                $(childBtns).html("+");
+
+                $(node).parent().removeClass("expanded");
+                $(node).html("+");
+            } else {
+                $(node).parent().addClass("expanded");
+                $(node).html("-");
+            }
+        }
 
     </script>
 
@@ -155,6 +223,12 @@
 
                 <div class="container">
 
+                    <asp:PlaceHolder runat="server" ID="PhBrowseTree">
+                        <div class="modal browse-modal">
+                            <asp:Literal runat="server" ID="litSitecoreContentTree"></asp:Literal>
+                        </div>
+                    </asp:PlaceHolder>
+
                     <span class="header">Database</span>
                     <asp:DropDownList runat="server" ID="ddDatabase" CssClass="ddDatabase" /><input runat="server" class="txtCustomDatabase" id="txtCustomDatabase" style="display: none" />
                     <br />
@@ -167,7 +241,7 @@
 
                     <span class="header">Start Item</span><a class="clear-btn" data-id="inputStartitem">clear</a><br />
                     <span class="notes">Enter the path or ID of the starting node. Only content beneath and including this node will be exported. If field is left blank, the starting node will be /sitecore/content</span><br />
-                    <input runat="server" id="inputStartitem" />
+                    <input runat="server" id="inputStartitem"/><asp:Button runat="server" ID="btnBrowse" OnClick="btnBrowse_OnClick" CssClass="browse-btn" Text="Browse"/>
                     <br />
                     <span>OR</span><br />
                     <span class="header">Fast Query</span><a class="clear-btn" id="clear-fast-query" data-id="txtFastQuery">clear</a><br />
@@ -184,12 +258,15 @@
                     <span class="notes">Enter template names and/or IDs separated by commas. Items will only be exported if their template is in this list. If this field is left blank, all templates will be included</span><br />
                     <textarea runat="server" id="inputTemplates" cols="60" row="5"></textarea>
                     <br />
+                    
                     <div class="hints">
                         <a class="show-hints">Hints</a>
                         <span class="notes">Example: Standard Page, {12345678-901-2345-6789-012345678901}
                         </span>
                     </div>
-                    <br />
+                    <asp:CheckBox runat="server" ID="chkIncludeTemplate"/> <span class="header">Include Template Name</span><br/>
+                    <span class="notes">Check this box to include the template name with each item</span><br/><br/>
+                    
 
                     <span class="header">Text Fields</span><a class="clear-btn" data-id="inputFields">clear</a><br />
                     <span class="notes">Enter field names or IDs separated by commas</span><br />

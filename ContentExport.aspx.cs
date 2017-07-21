@@ -17,10 +17,53 @@ namespace ContentExportTool
         {
             if (!IsPostBack)
             {
+                PhBrowseTree.Visible = false;
                 var databases = new List<string>() {"web", "master", "custom"};
                 ddDatabase.DataSource = databases;
-                ddDatabase.DataBind();
+                ddDatabase.DataBind();                
             }
+        }
+
+        protected string GetSitecoreTreeHtml()
+        {
+            var database = ddDatabase.SelectedValue;
+            SetDatabase(database);
+            var sitecoreTreeHtml = "<ul>";
+            var startNode = _db.GetItem("/sitecore/content");
+
+            sitecoreTreeHtml += GetItemAndChildren(startNode);
+
+            sitecoreTreeHtml += "</ul>";
+
+            return sitecoreTreeHtml;
+        }
+
+        protected string GetItemAndChildren(Item item)
+        {
+            var children = item.GetChildren().Cast<Item>();
+
+            var nodeHtml = "<li>";
+
+            if (children.Any())
+            {
+                nodeHtml += "<a class='browse-expand' onclick='expandNode($(this))'>+</a>";
+            }
+
+            nodeHtml += string.Format("<a class='sitecore-node' data-path='{0}'>{1}</a>", item.Paths.Path, item.Name);
+
+           
+            if (children.Any())
+            {
+                nodeHtml += "<ul>";
+                foreach (Item child in children)
+                {
+                    nodeHtml += GetItemAndChildren(child);
+                }
+                nodeHtml += "</ul>";
+            }
+
+            nodeHtml += "</li>";
+            return nodeHtml;
         }
 
         protected override void OnInit(EventArgs e)
@@ -97,8 +140,9 @@ namespace ContentExportTool
                 var includeMultilistIds = chkIncludeMultilistIds.Checked;
                 var includeRawImages = chkIncludeRawImages.Checked;
                 var includeRawLinks = chkIncludeRawLinks.Checked;
+                var includeTemplate = chkIncludeTemplate.Checked;
 
-                var allLanguages = chkAllLanguages.Checked;               
+                   var allLanguages = chkAllLanguages.Checked;               
 
                 var templateString = inputTemplates.Value;
                 var templates = templateString.ToLower().Split(',').Select(x => x.Trim());
@@ -146,6 +190,7 @@ namespace ContentExportTool
                 using (StringWriter sw = new StringWriter())
                 {
                     var headingString = "Item\t" + (includeIds ? "Item ID (guid)\t" : string.Empty) 
+                    + (includeTemplate ? "Template\t" : string.Empty)
                     + (allLanguages ? "Language\t" : string.Empty)
                     + GetExcelHeaderForFields(fields, false)
                     + GetExcelHeaderForFields(imageFields, includeImageIds, includeRawImages)
@@ -189,6 +234,12 @@ namespace ContentExportTool
                             if (includeIds)
                             {
                                 itemLine += item.ID + "\t";
+                            }
+
+                            if (includeTemplate)
+                            {
+                                var template = item.TemplateName;
+                                itemLine += template + "\t";
                             }
 
                             foreach (var field in fields)
@@ -560,6 +611,12 @@ namespace ContentExportTool
                 litFastQueryTest.Text = "Error: " + ex.Message;
             }
             
+        }
+
+        protected void btnBrowse_OnClick(object sender, EventArgs e)
+        {
+            litSitecoreContentTree.Text = GetSitecoreTreeHtml();
+            PhBrowseTree.Visible = true;
         }
     }
 }
