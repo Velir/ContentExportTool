@@ -149,97 +149,25 @@ namespace ContentExportTool {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlTextArea inputFields;
-        
+
         /// <summary>
-        /// inputImageFields control.
+        /// chkIncludeLinkedIds control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlTextArea inputImageFields;
-        
+        protected global::System.Web.UI.WebControls.CheckBox chkIncludeLinkedIds;
+
         /// <summary>
-        /// chkIncludeImageIds control.
+        /// chkIncludeRawHtml control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox chkIncludeImageIds;
-        
-        /// <summary>
-        /// chkIncludeRawImages control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox chkIncludeRawImages;
-        
-        /// <summary>
-        /// inputLinkFields control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlTextArea inputLinkFields;
-        
-        /// <summary>
-        /// chkIncludeRawLinks control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox chkIncludeRawLinks;
-        
-        /// <summary>
-        /// inputDroplistFields control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlTextArea inputDroplistFields;
-        
-        /// <summary>
-        /// chkIncludeDroplistIds control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox chkIncludeDroplistIds;
-        
-        /// <summary>
-        /// inputMultiFields control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlTextArea inputMultiFields;
-        
-        /// <summary>
-        /// chkIncludeMultilistIds control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox chkIncludeMultilistIds;
-        
-        /// <summary>
-        /// inputCheckboxFields control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlTextArea inputCheckboxFields;
-        
+        protected global::System.Web.UI.WebControls.CheckBox chkIncludeRawHtml;
+
         /// <summary>
         /// chkWorkflowName control.
         /// </summary>

@@ -268,7 +268,7 @@
                     <span class="notes">Check this box to include the template name with each item</span><br/><br/>
                     
 
-                    <span class="header">Text Fields</span><a class="clear-btn" data-id="inputFields">clear</a><br />
+                    <span class="header">Fields</span><a class="clear-btn" data-id="inputFields">clear</a><br />
                     <span class="notes">Enter field names or IDs separated by commas</span><br />
                     <textarea runat="server" id="inputFields" cols="60" row="5"></textarea>
                     <br /><br/>
@@ -277,39 +277,12 @@
 
 
                     <div class="advanced">
-                        <a class="advanced-btn">Advanced Fields</a>
+                        <a class="advanced-btn">Advanced Options</a>
                         <div class="advanced-inner">
 
-                            <span class="header">Image Fields</span><a class="clear-btn" data-id="inputImageFields">clear</a><br />
-                            <span class="notes">Enter field names or IDs separated by commas</span><br />
-                            <textarea runat="server" id="inputImageFields" cols="60" row="5"></textarea><br />
-                            <asp:CheckBox runat="server" ID="chkIncludeImageIds" /><span class="include-ids">Include image ID</span>
-                            <asp:CheckBox runat="server" ID="chkIncludeRawImages"/><span class="include-ids">Include raw image HTML</span>
-                            <br /><br/>
-
-                            <span class="header">Link Fields</span><a class="clear-btn" data-id="inputLinkFields">clear</a><br />
-                            <span class="notes">Enter field names or IDs separated by commas</span><br />
-                            <textarea runat="server" id="inputLinkFields" cols="60" row="5"></textarea><br/>
-                            <asp:CheckBox runat="server" ID="chkIncludeRawLinks"/><span class="include-ids">Include raw link HTML</span>
-                            <br /><br/>
-
-                            <span class="header">DropList Fields</span><a class="clear-btn" data-id="inputDroplistFields">clear</a><br />
-                            <span class="notes">Enter field names or IDs separated by commas</span><br />
-                            <textarea runat="server" id="inputDroplistFields" cols="60" row="5"></textarea><br />
-                            <asp:CheckBox runat="server" ID="chkIncludeDroplistIds" /><span class="include-ids">Include selected item ID</span>
-                            <br /><br/>
-
-                            <span class="header">Multilist Fields</span><a class="clear-btn" data-id="inputMultiFields">clear</a><br />
-                            <span class="notes">Enter field names or IDs separated by commas</span><br />
-                            <textarea runat="server" id="inputMultiFields" cols="60" row="5"></textarea><br />
-                            <asp:CheckBox runat="server" ID="chkIncludeMultilistIds" /><span class="include-ids">Include item IDs</span>
-                            <br /><br/>
+                            <asp:CheckBox runat="server" ID="chkIncludeLinkedIds" /><span class="header">Include linked item IDs </span><span class="notes">(images, links, droplists, multilists)</span><br/>
+                            <asp:CheckBox runat="server" ID="chkIncludeRawHtml"/><span class="header">Include raw HTML </span><span class="notes">(images and links)</span><br/>
                             
-                            <span class="header">Checkbox Fields</span><a class="clear-btn" data-id="inputCheckboxFields">clear</a><br />
-                            <span class="notes">Enter field names or IDs separated by commas</span><br />
-                            <textarea runat="server" id="inputCheckboxFields" cols="60" row="5"></textarea><br />
-                            <br /><br/>
-
                             <asp:CheckBox runat="server" CssClass="workflowBox" ID="chkWorkflowName" /><span class="header">Workflow</span><br />
                             <asp:CheckBox runat="server" CssClass="workflowBox" ID="chkWorkflowState" /><span class="header">Workflow State</span>
                             <br />
@@ -325,6 +298,8 @@
 
                             <asp:Button runat="server" ID="btnWebformsExport" OnClick="btnWebformsExport_OnClick" Text="Webforms" /><br />
                             <span class="notes">Download all Webforms for Marketers forms and fields</span>
+                            
+                            <asp:CheckBox runat="server" ID="test"/>
                         </div>
                     </div>
 

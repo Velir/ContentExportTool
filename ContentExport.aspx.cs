@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Sitecore.Data;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
+using Sitecore.Form.Web.UI.Controls;
 
 namespace ContentExportTool
 {
@@ -105,11 +106,6 @@ namespace ContentExportTool
             try
             {
                 var fieldString = inputFields.Value;
-                var imageFieldString = inputImageFields.Value;
-                var linkFieldString = inputLinkFields.Value;
-                var multiFieldString = inputMultiFields.Value;
-                var droplistFieldString = inputDroplistFields.Value;
-                var checkboxFieldString = inputCheckboxFields.Value;           
 
                 var includeWorkflowState = chkWorkflowState.Checked;
                 var includeworkflowName = chkWorkflowName.Checked;
@@ -128,18 +124,10 @@ namespace ContentExportTool
                 }
 
                 var fields = fieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
-                var imageFields = imageFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
-                var linkFields = linkFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
-                var multiFields = multiFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));  
-                var droplistFields = droplistFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
-                var checkboxFields = checkboxFieldString.Split(',').Select(x => x.Trim()).Where(x => !String.IsNullOrEmpty(x));
 
                 var includeIds = chkIncludeIds.Checked;
-                var includeImageIds = chkIncludeImageIds.Checked;
-                var includeDroplistIds = chkIncludeDroplistIds.Checked;
-                var includeMultilistIds = chkIncludeMultilistIds.Checked;
-                var includeRawImages = chkIncludeRawImages.Checked;
-                var includeRawLinks = chkIncludeRawLinks.Checked;
+                var includeLinkedIds = chkIncludeLinkedIds.Checked;
+                var includeRawHtml = chkIncludeRawHtml.Checked;
                 var includeTemplate = chkIncludeTemplate.Checked;
 
                    var allLanguages = chkAllLanguages.Checked;               
@@ -192,15 +180,11 @@ namespace ContentExportTool
                     var headingString = "Item\t" + (includeIds ? "Item ID (guid)\t" : string.Empty) 
                     + (includeTemplate ? "Template\t" : string.Empty)
                     + (allLanguages ? "Language\t" : string.Empty)
-                    + GetExcelHeaderForFields(fields, false)
-                    + GetExcelHeaderForFields(imageFields, includeImageIds, includeRawImages)
-                    + GetExcelHeaderForFields(linkFields, false, includeRawLinks)
-                    + GetExcelHeaderForFields(droplistFields, includeDroplistIds)
-                    + GetExcelHeaderForFields(multiFields, includeMultilistIds)
-                    + GetExcelHeaderForFields(checkboxFields)
+                    + GetExcelHeaderForFields(fields, includeLinkedIds, includeRawHtml)
                     + (includeworkflowName ? "Workflow\t" : string.Empty)
                     + (includeWorkflowState ? "Workflow State\t" : string.Empty );
-                    sw.WriteLine(headingString);
+
+                    var dataLines = new List<string>();
 
                     foreach (var baseItem in items)
                     {
@@ -250,182 +234,206 @@ namespace ContentExportTool
                                     if (itemField == null)
                                     {
                                         itemLine += "n/a\t";
-                                    }
-                                    else
-                                    {
-                                        itemLine += RemoveLineEndings(itemField.Value) + "\t";
-                                    }
-                                }
-                            }
-
-                            foreach (var field in imageFields)
-                            {
-                                if (!string.IsNullOrEmpty(field))
-                                {
-                                    ImageField itemField = item.Fields[field];
-                                    if (itemField == null)
-                                    {
-                                        itemLine += "n/a\t";
-
-                                        if (includeImageIds)
+                                        if (includeLinkedIds)
                                         {
                                             itemLine += "n/a\t";
                                         }
-
-                                        if (includeRawImages)
-                                        {
-                                            itemLine += "n/a\t";
-                                        }
-                                    }
-                                    else if (itemField.MediaItem == null)
-                                    {
-
-                                        itemLine += "\t";
-                                        if (includeImageIds)
-                                        {
-                                            itemLine += "\t";
-                                        }
-
-                                        if (includeRawImages)
-                                        {
-                                            itemLine += "\t";
-                                        }
-                                    }
-                                    else
-                                    {
-                                        itemLine += itemField.MediaItem.Paths.MediaPath + "\t";
-                                        if (includeImageIds)
-                                        {
-                                            itemLine += itemField.MediaItem.ID + "\t";
-                                        }
-
-                                        if (includeRawImages)
-                                        {
-                                            itemLine += itemField.Value + "\t";
-                                        }
-                                    }
-                                }
-                            }
-
-                            foreach (var field in linkFields)
-                            {
-                                if (!string.IsNullOrEmpty(field))
-                                {
-                                    LinkField itemField = item.Fields[field];
-                                    if (itemField == null)
-                                    {
-                                        itemLine += "n/a\t";
-
-                                        if (includeRawLinks)
+                                        if (includeRawHtml)
                                         {
                                             itemLine += "n/a\t";
                                         }
                                     }
                                     else
                                     {
-                                        itemLine += itemField.Url + "\t";
-
-                                        if (includeRawLinks)
+                                        if (FieldTypeManager.GetField(itemField) is ImageField) // if image field
                                         {
-                                            itemLine += itemField.Value + "\t";
-                                        }
-                                    }
-                                }
-                            }
-
-                            foreach (var field in droplistFields)
-                            {
-                                ReferenceField fieldLink = item.Fields[field];
-                                if (fieldLink == null)
-                                {
-                                    itemLine += "n/a\t";
-                                    if (includeDroplistIds)
-                                    {
-                                        itemLine += "n/a\t";
-                                    }
-                                }
-                                else if (fieldLink.TargetItem == null)
-                                {
-                                    itemLine += "\t";
-                                    if (includeDroplistIds)
-                                    {
-                                        itemLine += "\t";
-                                    }
-                                }
-                                else
-                                {
-                                    itemLine += fieldLink.TargetItem.DisplayName + "\t";
-                                    if (includeDroplistIds)
-                                    {
-                                        itemLine += fieldLink.TargetID + "\t";
-                                    }
-                                }
-                            }
-
-                            foreach (var field in multiFields)
-                            {
-                                if (!string.IsNullOrEmpty(field))
-                                {
-                                    MultilistField itemField = item.Fields[field];
-                                    if (itemField == null)
-                                    {
-                                        itemLine += "n/a\t";
-                                        if (includeMultilistIds)
-                                        {
-                                            itemLine += "n/a\t";
-                                        }
-                                    }
-                                    else
-                                    {
-                                        var multiItems = itemField.GetItems();
-                                        var data = "";
-                                        var first = true;
-                                        foreach (var i in multiItems)
-                                        {
-                                            if (!first)
+                                            ImageField imageField = itemField;
+                                            if (includeLinkedIds)
                                             {
-                                                data += "\n";
+                                                headingString = headingString.Replace(String.Format("{0}-ID", field), String.Format("{0} ID\t", field));
                                             }
-                                            var url = i.Paths.ContentPath;
-                                            data += url + ";";
-                                            first = false;
-                                        }
-                                        itemLine += "\"" + data + "\"" + "\t";
-
-                                        if (includeMultilistIds)
-                                        {
-                                            first = true;
-                                            var idData = "";
-                                            foreach (var i in multiItems)
+                                            if (includeRawHtml)
                                             {
-                                                if (!first)
+                                                headingString = headingString.Replace(String.Format("{0}-HTML", field), String.Format("{0} Raw HTML\t", field));
+                                            }
+                                            if (imageField == null)
+                                            {
+                                                itemLine += "n/a\t";
+
+                                                if (includeLinkedIds)
                                                 {
-                                                    idData += "\n";
+                                                    itemLine += "n/a\t";
                                                 }
-                                                idData += i.ID + ";";
-                                                first = false;
-                                            }
-                                            itemLine += "\"" + idData + "\"" + "\t";
-                                        }
-                                    }
-                                }
-                            }
 
-                            foreach (var field in checkboxFields)
-                            {
-                                if (!string.IsNullOrEmpty(field))
-                                {
-                                    CheckboxField itemField = item.Fields[field];
-                                    if (itemField == null)
-                                    {
-                                        itemLine += "n/a\t";
-                                    }
-                                    else
-                                    {
-                                        itemLine += itemField.Checked.ToString() + "\t";
+                                                if (includeRawHtml)
+                                                {
+                                                    itemLine += "n/a\t";
+                                                }
+                                            }
+                                            else if (imageField.MediaItem == null)
+                                            {
+
+                                                itemLine += "\t";
+                                                if (includeLinkedIds)
+                                                {
+                                                    itemLine += "\t";
+                                                }
+
+                                                if (includeRawHtml)
+                                                {
+                                                    itemLine += "\t";
+                                                }
+                                            }
+                                            else
+                                            {
+                                                itemLine += imageField.MediaItem.Paths.MediaPath + "\t";
+                                                if (includeLinkedIds)
+                                                {
+                                                    itemLine += imageField.MediaItem.ID + "\t";
+                                                }
+
+                                                if (includeRawHtml)
+                                                {
+                                                    itemLine += imageField.Value + "\t";
+                                                }
+                                            }
+                                        }else if (FieldTypeManager.GetField(itemField) is LinkField)
+                                        {
+                                            LinkField linkField = itemField;
+                                            if (includeLinkedIds)
+                                            {
+                                                headingString = headingString.Replace(String.Format("{0}-ID", field), String.Empty);
+                                            }
+                                            if (includeRawHtml)
+                                            {
+                                                headingString = headingString.Replace(String.Format("{0}-HTML", field), String.Format("{0} Raw HTML\t", field));
+                                            }
+                                            if (linkField == null)
+                                            {
+                                                itemLine += "n/a\t";
+
+                                                if (includeRawHtml)
+                                                {
+                                                    itemLine += "n/a\t";
+                                                }
+                                            }
+                                            else
+                                            {
+                                                itemLine += linkField.Url + "\t";
+
+                                                if (includeRawHtml)
+                                                {
+                                                    itemLine += linkField.Value + "\t";
+                                                }
+                                            }
+                                        }else if (FieldTypeManager.GetField(itemField) is ReferenceField)
+                                        {
+                                            ReferenceField refField = itemField;
+                                            if (includeLinkedIds)
+                                            {
+                                                headingString = headingString.Replace(String.Format("{0}-ID", field), String.Format("{0} ID\t", field));
+                                            }
+                                            if (includeRawHtml)
+                                            {
+                                                headingString = headingString.Replace(String.Format("{0}-HTML", field), String.Empty);
+                                            }
+                                            if (refField == null)
+                                            {
+                                                itemLine += "n/a\t";
+                                                if (includeLinkedIds)
+                                                {
+                                                    itemLine += "n/a\t";
+                                                }
+                                            }
+                                            else if (refField.TargetItem == null)
+                                            {
+                                                itemLine += "\t";
+                                                if (includeLinkedIds)
+                                                {
+                                                    itemLine += "\t";
+                                                }
+                                            }
+                                            else
+                                            {
+                                                itemLine += refField.TargetItem.DisplayName + "\t";
+                                                if (includeLinkedIds)
+                                                {
+                                                    itemLine += refField.TargetID + "\t";
+                                                }
+                                            }
+                                        }else if (FieldTypeManager.GetField(itemField) is MultilistField)
+                                        {
+                                            MultilistField multiField = itemField;
+                                            if (includeLinkedIds)
+                                            {
+                                                headingString = headingString.Replace(String.Format("{0}-ID", field), String.Format("{0} ID\t", field));
+                                            }
+                                            if (includeRawHtml)
+                                            {
+                                                headingString = headingString.Replace(String.Format("{0}-HTML", field), String.Empty);
+                                            }
+                                            if (multiField == null)
+                                            {
+                                                itemLine += "n/a\t";
+                                                if (includeLinkedIds)
+                                                {
+                                                    itemLine += "n/a\t";
+                                                }
+                                            }
+                                            else
+                                            {
+                                                var multiItems = multiField.GetItems();
+                                                var data = "";
+                                                var first = true;
+                                                foreach (var i in multiItems)
+                                                {
+                                                    if (!first)
+                                                    {
+                                                        data += "\n";
+                                                    }
+                                                    var url = i.Paths.ContentPath;
+                                                    data += url + ";";
+                                                    first = false;
+                                                }
+                                                itemLine += "\"" + data + "\"" + "\t";
+
+                                                if (includeLinkedIds)
+                                                {
+                                                    first = true;
+                                                    var idData = "";
+                                                    foreach (var i in multiItems)
+                                                    {
+                                                        if (!first)
+                                                        {
+                                                            idData += "\n";
+                                                        }
+                                                        idData += i.ID + ";";
+                                                        first = false;
+                                                    }
+                                                    itemLine += "\"" + idData + "\"" + "\t";
+                                                }
+                                            }
+                                        }else if (FieldTypeManager.GetField(itemField) is CheckboxField)
+                                        {
+                                            CheckboxField checkboxField = itemField;
+                                            headingString = headingString.Replace(String.Format("{0}-ID", field), string.Empty).Replace(String.Format("{0}-HTML", field), string.Empty);
+                                            if (itemField == null)
+                                            {
+                                                itemLine += "n/a\t";
+                                            }
+                                            else
+                                            {
+                                                itemLine += checkboxField.Checked.ToString() + "\t";
+                                            }
+                                        }
+                                        else // default text field
+                                        {
+                                            itemLine += RemoveLineEndings(itemField.Value) + "\t";
+                                            headingString = headingString.Replace(String.Format("{0}-ID", field), string.Empty).Replace(String.Format("{0}-HTML", field), string.Empty);
+                                        }                                       
                                     }
                                 }
-                            }
+                            }                          
 
                             if (includeWorkflowState || includeworkflowName)
                             {
@@ -467,8 +475,14 @@ namespace ContentExportTool
                                 }
                             }
 
-                            sw.WriteLine(itemLine);
-                        }                     
+                            dataLines.Add(itemLine);
+                        }                                                             
+                    }
+
+                    sw.WriteLine(headingString);
+                    foreach (var line in dataLines)
+                    {
+                        sw.WriteLine(line);
                     }
 
                     Response.Output.Write(sw.ToString());
@@ -507,14 +521,21 @@ namespace ContentExportTool
                 var fieldName = GetFieldNameIfGuid(field);
 
                 header += fieldName + "\t";
+
+                // get field type
+
+                // if includeId and type == image, droplist, multilist, add ID header
+
+                // if includeRaw and type == image, link, add Raw header
+
                 if (includeId)
                 {
-                    header += String.Format("{0} ID", fieldName) + "\t";
+                    header += String.Format("{0}-ID", fieldName);
                 }
 
                 if (includeRaw)
                 {
-                    header += String.Format("{0} HTML", fieldName) + "\t";
+                    header += String.Format("{0}-HTML", fieldName);
                 }
             }
             return header;
