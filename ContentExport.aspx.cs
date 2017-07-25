@@ -233,15 +233,7 @@ namespace ContentExportTool
                                     var itemField = item.Fields[field];
                                     if (itemField == null)
                                     {
-                                        itemLine += "n/a\t";
-                                        if (includeLinkedIds)
-                                        {
-                                            itemLine += "n/a\t";
-                                        }
-                                        if (includeRawHtml)
-                                        {
-                                            itemLine += "n/a\t";
-                                        }
+                                        itemLine += String.Format("n/a\t{0}-ID{0}-HTML", field);
                                     }
                                     else
                                     {
@@ -479,10 +471,23 @@ namespace ContentExportTool
                         }                                                             
                     }
 
+                    // remove any field-ID and field-RAW from header that haven't been replaced (i.e. non-existent field)
+                    foreach (var field in fields)
+                    {
+                        headingString = headingString.Replace(String.Format("{0}-ID", field), String.Empty);
+                        headingString = headingString.Replace(String.Format("{0}-HTML", field), String.Empty);
+                    }
+
                     sw.WriteLine(headingString);
                     foreach (var line in dataLines)
                     {
-                        sw.WriteLine(line);
+                        var newLine = line;
+                        foreach (var field in fields)
+                        {
+                            newLine = newLine.Replace(String.Format("{0}-ID", field), headingString.Contains(String.Format("{0} ID", field)) ? "n/a\t" : string.Empty);
+                            newLine = newLine.Replace(String.Format("{0}-HTML", field), headingString.Contains(String.Format("{0} Raw HTML", field)) ? "n/a\t" : string.Empty);
+                        }
+                        sw.WriteLine(newLine);
                     }
 
                     Response.Output.Write(sw.ToString());
@@ -521,12 +526,6 @@ namespace ContentExportTool
                 var fieldName = GetFieldNameIfGuid(field);
 
                 header += fieldName + "\t";
-
-                // get field type
-
-                // if includeId and type == image, droplist, multilist, add ID header
-
-                // if includeRaw and type == image, link, add Raw header
 
                 if (includeId)
                 {
