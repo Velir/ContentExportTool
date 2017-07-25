@@ -68,7 +68,9 @@ namespace ContentExportTool {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList ddDatabase;
-        
+
+        protected global::System.Web.UI.WebControls.DropDownList ddSavedSettings;
+
         /// <summary>
         /// txtCustomDatabase control.
         /// </summary>
@@ -113,7 +115,9 @@ namespace ContentExportTool {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlInputText txtFastQuery;
-        
+
+        protected global::System.Web.UI.HtmlControls.HtmlInputText txtSaveSettingsName;
+
         /// <summary>
         /// btnTestFastQuery control.
         /// </summary>
@@ -122,7 +126,9 @@ namespace ContentExportTool {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnTestFastQuery;
-        
+
+        protected global::System.Web.UI.WebControls.Button btnSaveSettings;
+
         /// <summary>
         /// litFastQueryTest control.
         /// </summary>
@@ -131,7 +137,9 @@ namespace ContentExportTool {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal litFastQueryTest;
-        
+
+        protected global::System.Web.UI.WebControls.Literal litSavedMessage;
+
         /// <summary>
         /// inputTemplates control.
         /// </summary>
@@ -214,5 +222,7 @@ namespace ContentExportTool {
         protected global::System.Web.UI.WebControls.Button btnWebformsExport;
 
         protected global::System.Web.UI.WebControls.PlaceHolder PhBrowseTree;
+
+        protected global::System.Web.UI.WebControls.PlaceHolder phSaveSettingsPopup;
     }
 }

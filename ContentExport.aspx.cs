@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Web.Script.Serialization;
 using Sitecore.Data;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
@@ -13,11 +14,13 @@ namespace ContentExportTool
     public partial class ContentExport : Sitecore.sitecore.admin.AdminPage
     {
         private Database _db;
+        private string _settingsFilePath = AppDomain.CurrentDomain.BaseDirectory + @"\sitecore\admin\ContentExportSettings.txt";
 
         protected void Page_Load(object sender, EventArgs e)
-        {
+        {  
             if (!IsPostBack)
             {
+                txtSaveSettingsName.Value = string.Empty;
                 PhBrowseTree.Visible = false;
                 var databaseNames = Sitecore.Configuration.Factory.GetDatabaseNames().ToList(); 
                 // make web the default database
@@ -28,7 +31,16 @@ namespace ContentExportTool
                     databaseNames.Insert(0, webDb);
                 }
                 ddDatabase.DataSource = databaseNames;
-                ddDatabase.DataBind();                
+                ddDatabase.DataBind();
+
+                var savedSettings = ReadSettingsFromFile();
+                if (savedSettings != null)
+                {
+                    var settingsNames = savedSettings.Settings.Select(x => x.Name).ToList();
+                    settingsNames.Insert(0, "");
+                    ddSavedSettings.DataSource = settingsNames;
+                    ddSavedSettings.DataBind();
+                }
             }
         }
 
@@ -644,6 +656,129 @@ namespace ContentExportTool
         {
             litSitecoreContentTree.Text = GetSitecoreTreeHtml();
             PhBrowseTree.Visible = true;
+        }
+
+        protected SettingsList ReadSettingsFromFile()
+        {
+            var serializer = new JavaScriptSerializer();
+
+            if (!File.Exists(_settingsFilePath))
+            {
+                return null;
+            }
+
+            var fileContents = File.ReadAllText(_settingsFilePath);
+            // convert into a list of settings
+            var settingsList = serializer.Deserialize<SettingsList>(fileContents);
+            return settingsList;
+        }
+
+        protected void btnSaveSettings_OnClick(object sender, EventArgs e)
+        {
+            var saveName = txtSaveSettingsName.Value;
+
+            var settingsData = new ExportSettingsData()
+            {
+                Database = ddDatabase.SelectedValue,
+                IncludeIds = chkIncludeIds.Checked,
+                StartItem = inputStartitem.Value,
+                FastQuery = txtFastQuery.Value,
+                Templates = inputTemplates.Value,
+                IncludeTemplateName = chkIncludeTemplate.Checked,
+                Fields = inputFields.Value,
+                IncludeLinkedIds = chkIncludeLinkedIds.Checked,
+                IncludeRaw = chkIncludeRawHtml.Checked,
+                Workflow = chkWorkflowName.Checked,
+                WorkflowState = chkWorkflowState.Checked,
+                GetAllLanguages = chkAllLanguages.Checked
+            };
+
+            var settingsObject = new ExportSettings()
+            {
+                Name = saveName,
+                Data = settingsData
+            };
+
+            var serializer = new JavaScriptSerializer();
+
+            var savedSettings = ReadSettingsFromFile();           
+
+            if (savedSettings == null)
+            {
+                var settingsList = new SettingsList();
+                settingsList.Settings = new List<ExportSettings>()
+                {
+                    settingsObject
+                };
+                var settingsJson = serializer.Serialize(settingsList);
+                File.WriteAllText(_settingsFilePath, settingsJson);
+            }
+            else
+            {
+                if (savedSettings.Settings.Any(x => x.Name == saveName))
+                {
+                    litSavedMessage.Text = "Error: Name has already been used. Please save under a different name";
+                    return;
+                }
+
+                savedSettings.Settings.Insert(0, settingsObject);
+                var settingsListJson = serializer.Serialize(savedSettings);
+                File.WriteAllText(_settingsFilePath, settingsListJson);
+            }
+
+                litSavedMessage.Text = "Saved!";
+        }
+
+        public class SettingsList
+        {
+            public List<ExportSettings> Settings;
+        }
+
+        public class ExportSettings
+        {
+            public string Name;
+            public ExportSettingsData Data;
+        }
+
+        public class ExportSettingsData
+        {
+            public string Database;
+            public bool IncludeIds;
+            public string StartItem;
+            public string FastQuery;
+            public string Templates;
+            public bool IncludeTemplateName;
+            public string Fields;
+            public bool IncludeLinkedIds;
+            public bool IncludeRaw;
+            public bool Workflow;
+            public bool WorkflowState;
+            public bool GetAllLanguages;
+        }
+
+        protected void ddSavedSettings_OnSelectedIndexChanged(object sender, EventArgs e)
+        {
+            var settingsName = ddSavedSettings.SelectedValue;
+            var savedSettings = ReadSettingsFromFile();
+            if (savedSettings == null) return;
+            var selectedSettings = savedSettings.Settings.FirstOrDefault(x => x.Name == settingsName);
+            var settings = selectedSettings.Data;
+
+            if (!String.IsNullOrEmpty(settings.Database))
+            {
+                ddDatabase.SelectedValue = settings.Database;
+            }
+            chkIncludeIds.Checked = settings.IncludeIds;
+            inputStartitem.Value = settings.StartItem;
+            txtFastQuery.Value = settings.FastQuery;
+            inputTemplates.Value = settings.Templates;
+            chkIncludeTemplate.Checked = settings.IncludeTemplateName;
+            inputFields.Value = settings.Fields;
+            chkIncludeLinkedIds.Checked = settings.IncludeLinkedIds;
+            chkIncludeRawHtml.Checked = settings.IncludeRaw;
+            chkWorkflowName.Checked = settings.Workflow;
+            chkWorkflowState.Checked = settings.WorkflowState;
+            chkAllLanguages.Checked = settings.GetAllLanguages;
         }
     }
 }

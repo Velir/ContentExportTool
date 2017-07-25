@@ -140,6 +140,58 @@
         .modal.browse-modal .sitecore-node {
             margin-left: 12px;
         }
+
+        .main-btns .right {
+            float: right;
+        }
+
+        .main-btns {
+            width: 600px;
+            display: inline-block;
+            height: auto;
+        }
+
+        .main-btns .left {
+            float: left;
+        }
+
+        .save-settings-box {
+            border: 1px solid;
+            background: #eee;
+            padding: 5px;
+            left: 20%;
+        }
+
+        .save-settings-box input[type="text"] {
+            width: 200px;
+        }
+
+        .save-settings-close {
+            position: absolute;
+            right: 2px;
+            cursor: pointer;
+            top: 2px;
+        }
+
+        #btnSaveSettings {
+            display: none;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 12px;
+            display: none;
+        }
+
+        span.save-message {
+            color: brown;
+            margin-left: 2px;
+            display: inline-block;
+        }
+
+        .row:not(:last-child) {
+            margin-bottom: 5px;
+        }
     </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script>
@@ -178,6 +230,7 @@
                 var id = $(this).attr("data-id");
                 var input = $("#" + id);
                 $(input).val("");
+                removeSavedMessage();
             });
 
             $("#clear-fast-query").on("click", function () {
@@ -186,7 +239,25 @@
 
             $(".show-hints").on("click", function () {
                 $(this).next(".notes").slideToggle();
-            });           
+            });
+
+            $(".save-btn-decoy").on("click", function () {
+                var saveName = $("#txtSaveSettingsName").val();
+                if (saveName === "") {
+                    $(".error-message").show();
+                    $(".save-settings-box input[type='text']").css("border", "1px solid red");
+                } else {
+                    $("#btnSaveSettings").click();
+                }
+            });
+
+            $("input").on("change", function() {
+                removeSavedMessage();
+            });
+
+            $("select").on("change", function() {
+                removeSavedMessage();
+            });
         });
 
         function expandNode(node) {
@@ -205,6 +276,10 @@
             }
         }
 
+        function removeSavedMessage() {
+            $(".save-message").html("");
+        }
+
     </script>
 
 </head>
@@ -218,7 +293,34 @@
             </div>
 
             <div class="controls">
-                <asp:Button runat="server" ID="btnRunExport" OnClick="btnRunExport_OnClick" Text="Run Export" /><br />
+
+                
+
+                <div class="main-btns">
+                    <div class="left">
+                        <asp:Button runat="server" ID="btnRunExport" OnClick="btnRunExport_OnClick" Text="Run Export" />
+                    </div>
+
+                    <div class="right">
+                        <div class="save-settings-box">
+                            <div class="row">
+                                <span class="header">Enter a name to save: </span>
+                                <input runat="server" id="txtSaveSettingsName" />
+                                <input type="button" class="save-btn-decoy" value="Save Settings" />
+                                <asp:Button runat="server" ID="btnSaveSettings" OnClick="btnSaveSettings_OnClick" Text="Save Settings" /><span class="save-message">
+                                    <asp:Literal runat="server" ID="litSavedMessage"></asp:Literal></span>
+                                
+                                <span class="error-message">You must enter a name for this configuration<br />
+                                </span>
+                            </div>
+                            <div class="row">
+                                <span class="header">Saved settings: </span>
+                                <asp:DropDownList runat="server" ID="ddSavedSettings" AutoPostBack="True" OnSelectedIndexChanged="ddSavedSettings_OnSelectedIndexChanged"/><br />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
                 <br />
 
                 <div class="container">
@@ -301,7 +403,7 @@
                             
                             <asp:CheckBox runat="server" ID="test"/>
                         </div>
-                    </div>
+                    </div>                  
 
                 </div>
 
