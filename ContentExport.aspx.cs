@@ -19,8 +19,15 @@ namespace ContentExportTool
             if (!IsPostBack)
             {
                 PhBrowseTree.Visible = false;
-                var databases = new List<string>() {"web", "master", "custom"};
-                ddDatabase.DataSource = databases;
+                var databaseNames = Sitecore.Configuration.Factory.GetDatabaseNames().ToList(); 
+                // make web the default database
+                var webDb = databaseNames.FirstOrDefault(x => x.ToLower().Contains("web"));
+                if (webDb != null)
+                {
+                    databaseNames.Remove(webDb);
+                    databaseNames.Insert(0, webDb);
+                }
+                ddDatabase.DataSource = databaseNames;
                 ddDatabase.DataBind();                
             }
         }
