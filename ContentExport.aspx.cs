@@ -33,14 +33,19 @@ namespace ContentExportTool
                 ddDatabase.DataSource = databaseNames;
                 ddDatabase.DataBind();
 
-                var savedSettings = ReadSettingsFromFile();
-                if (savedSettings != null)
-                {
-                    var settingsNames = savedSettings.Settings.Select(x => x.Name).ToList();
-                    settingsNames.Insert(0, "");
-                    ddSavedSettings.DataSource = settingsNames;
-                    ddSavedSettings.DataBind();
-                }
+                SetSavedSettingsDropdown();
+            }
+        }
+
+        protected void SetSavedSettingsDropdown()
+        {
+            var savedSettings = ReadSettingsFromFile();
+            if (savedSettings != null)
+            {
+                var settingsNames = savedSettings.Settings.Select(x => x.Name).ToList();
+                settingsNames.Insert(0, "");
+                ddSavedSettings.DataSource = settingsNames;
+                ddSavedSettings.DataBind();
             }
         }
 
@@ -196,7 +201,7 @@ namespace ContentExportTool
 
                 using (StringWriter sw = new StringWriter())
                 {
-                    var headingString = "Item\t" + (includeIds ? "Item ID (guid)\t" : string.Empty) 
+                    var headingString = "Item\t" + (includeIds ? "Item ID\t" : string.Empty) 
                     + (includeTemplate ? "Template\t" : string.Empty)
                     + (allLanguages ? "Language\t" : string.Empty)
                     + GetExcelHeaderForFields(fields, includeLinkedIds, includeRawHtml)
@@ -249,10 +254,11 @@ namespace ContentExportTool
                             {
                                 if (!String.IsNullOrEmpty(field))
                                 {
+                                    var fieldName = GetFieldNameIfGuid(field);
                                     var itemField = item.Fields[field];
                                     if (itemField == null)
                                     {
-                                        itemLine += String.Format("n/a\t{0}-ID{0}-HTML", field);
+                                        itemLine += String.Format("n/a\t{0}-ID{0}-HTML", fieldName);
                                     }
                                     else
                                     {
@@ -261,11 +267,11 @@ namespace ContentExportTool
                                             ImageField imageField = itemField;
                                             if (includeLinkedIds)
                                             {
-                                                headingString = headingString.Replace(String.Format("{0}-ID", field), String.Format("{0} ID\t", field));
+                                                headingString = headingString.Replace(String.Format("{0}-ID", fieldName), String.Format("{0} ID\t", fieldName));
                                             }
                                             if (includeRawHtml)
                                             {
-                                                headingString = headingString.Replace(String.Format("{0}-HTML", field), String.Format("{0} Raw HTML\t", field));
+                                                headingString = headingString.Replace(String.Format("{0}-HTML", fieldName), String.Format("{0} Raw HTML\t", fieldName));
                                             }
                                             if (imageField == null)
                                             {
@@ -313,11 +319,11 @@ namespace ContentExportTool
                                             LinkField linkField = itemField;
                                             if (includeLinkedIds)
                                             {
-                                                headingString = headingString.Replace(String.Format("{0}-ID", field), String.Empty);
+                                                headingString = headingString.Replace(String.Format("{0}-ID", fieldName), String.Empty);
                                             }
                                             if (includeRawHtml)
                                             {
-                                                headingString = headingString.Replace(String.Format("{0}-HTML", field), String.Format("{0} Raw HTML\t", field));
+                                                headingString = headingString.Replace(String.Format("{0}-HTML", fieldName), String.Format("{0} Raw HTML\t", fieldName));
                                             }
                                             if (linkField == null)
                                             {
@@ -342,11 +348,11 @@ namespace ContentExportTool
                                             ReferenceField refField = itemField;
                                             if (includeLinkedIds)
                                             {
-                                                headingString = headingString.Replace(String.Format("{0}-ID", field), String.Format("{0} ID\t", field));
+                                                headingString = headingString.Replace(String.Format("{0}-ID", fieldName), String.Format("{0} ID\t", fieldName));
                                             }
                                             if (includeRawHtml)
                                             {
-                                                headingString = headingString.Replace(String.Format("{0}-HTML", field), String.Empty);
+                                                headingString = headingString.Replace(String.Format("{0}-HTML", fieldName), String.Empty);
                                             }
                                             if (refField == null)
                                             {
@@ -377,11 +383,11 @@ namespace ContentExportTool
                                             MultilistField multiField = itemField;
                                             if (includeLinkedIds)
                                             {
-                                                headingString = headingString.Replace(String.Format("{0}-ID", field), String.Format("{0} ID\t", field));
+                                                headingString = headingString.Replace(String.Format("{0}-ID", fieldName), String.Format("{0} ID\t", fieldName));
                                             }
                                             if (includeRawHtml)
                                             {
-                                                headingString = headingString.Replace(String.Format("{0}-HTML", field), String.Empty);
+                                                headingString = headingString.Replace(String.Format("{0}-HTML", fieldName), String.Empty);
                                             }
                                             if (multiField == null)
                                             {
@@ -427,7 +433,7 @@ namespace ContentExportTool
                                         }else if (FieldTypeManager.GetField(itemField) is CheckboxField)
                                         {
                                             CheckboxField checkboxField = itemField;
-                                            headingString = headingString.Replace(String.Format("{0}-ID", field), string.Empty).Replace(String.Format("{0}-HTML", field), string.Empty);
+                                            headingString = headingString.Replace(String.Format("{0}-ID", fieldName), string.Empty).Replace(String.Format("{0}-HTML", fieldName), string.Empty);
                                             if (itemField == null)
                                             {
                                                 itemLine += "n/a\t";
@@ -440,7 +446,7 @@ namespace ContentExportTool
                                         else // default text field
                                         {
                                             itemLine += RemoveLineEndings(itemField.Value) + "\t";
-                                            headingString = headingString.Replace(String.Format("{0}-ID", field), string.Empty).Replace(String.Format("{0}-HTML", field), string.Empty);
+                                            headingString = headingString.Replace(String.Format("{0}-ID", fieldName), string.Empty).Replace(String.Format("{0}-HTML", fieldName), string.Empty);
                                         }                                       
                                     }
                                 }
@@ -493,8 +499,9 @@ namespace ContentExportTool
                     // remove any field-ID and field-RAW from header that haven't been replaced (i.e. non-existent field)
                     foreach (var field in fields)
                     {
-                        headingString = headingString.Replace(String.Format("{0}-ID", field), String.Empty);
-                        headingString = headingString.Replace(String.Format("{0}-HTML", field), String.Empty);
+                        var fieldName = GetFieldNameIfGuid(field);
+                        headingString = headingString.Replace(String.Format("{0}-ID", fieldName), String.Empty);
+                        headingString = headingString.Replace(String.Format("{0}-HTML", fieldName), String.Empty);
                     }
 
                     sw.WriteLine(headingString);
@@ -503,8 +510,9 @@ namespace ContentExportTool
                         var newLine = line;
                         foreach (var field in fields)
                         {
-                            newLine = newLine.Replace(String.Format("{0}-ID", field), headingString.Contains(String.Format("{0} ID", field)) ? "n/a\t" : string.Empty);
-                            newLine = newLine.Replace(String.Format("{0}-HTML", field), headingString.Contains(String.Format("{0} Raw HTML", field)) ? "n/a\t" : string.Empty);
+                            var fieldName = GetFieldNameIfGuid(field);
+                            newLine = newLine.Replace(String.Format("{0}-ID", fieldName), headingString.Contains(String.Format("{0} ID", fieldName)) ? "n/a\t" : string.Empty);
+                            newLine = newLine.Replace(String.Format("{0}-HTML", fieldName), headingString.Contains(String.Format("{0} Raw HTML", fieldName)) ? "n/a\t" : string.Empty);
                         }
                         sw.WriteLine(newLine);
                     }
@@ -717,7 +725,7 @@ namespace ContentExportTool
             {
                 if (savedSettings.Settings.Any(x => x.Name == saveName))
                 {
-                    litSavedMessage.Text = "Error: Name has already been used. Please save under a different name";
+                    litErrorMessage.Text = "Error: Name has already been used. Please save under a different name";
                     return;
                 }
 
@@ -725,8 +733,9 @@ namespace ContentExportTool
                 var settingsListJson = serializer.Serialize(savedSettings);
                 File.WriteAllText(_settingsFilePath, settingsListJson);
             }
-
-                litSavedMessage.Text = "Saved!";
+            litErrorMessage.Text = "";
+            litSavedMessage.Text = "Saved!";
+            SetSavedSettingsDropdown();
         }
 
         public class SettingsList

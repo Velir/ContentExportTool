@@ -183,6 +183,10 @@
             display: none;
         }
 
+        .error-message.server {
+            display: block;
+        }
+
         span.save-message {
             color: brown;
             margin-left: 2px;
@@ -308,7 +312,7 @@
                                 <input runat="server" id="txtSaveSettingsName" />
                                 <input type="button" class="save-btn-decoy" value="Save Settings" />
                                 <asp:Button runat="server" ID="btnSaveSettings" OnClick="btnSaveSettings_OnClick" Text="Save Settings" /><span class="save-message">
-                                    <asp:Literal runat="server" ID="litSavedMessage"></asp:Literal></span>
+                                    <asp:Literal runat="server" ID="litSavedMessage"></asp:Literal></span><span class="error-message server"><asp:Literal runat="server" ID="litErrorMessage"></asp:Literal></span>
                                 
                                 <span class="error-message">You must enter a name for this configuration<br />
                                 </span>
