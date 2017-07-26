@@ -262,7 +262,8 @@ namespace ContentExportTool
                                     }
                                     else
                                     {
-                                        if (FieldTypeManager.GetField(itemField) is ImageField) // if image field
+                                        var itemOfType = FieldTypeManager.GetField(itemField);
+                                        if (itemOfType is ImageField) // if image field
                                         {
                                             ImageField imageField = itemField;
                                             if (includeLinkedIds)
@@ -314,7 +315,7 @@ namespace ContentExportTool
                                                     itemLine += imageField.Value + "\t";
                                                 }
                                             }
-                                        }else if (FieldTypeManager.GetField(itemField) is LinkField)
+                                        }else if (itemOfType is LinkField)
                                         {
                                             LinkField linkField = itemField;
                                             if (includeLinkedIds)
@@ -343,7 +344,7 @@ namespace ContentExportTool
                                                     itemLine += linkField.Value + "\t";
                                                 }
                                             }
-                                        }else if (FieldTypeManager.GetField(itemField) is ReferenceField)
+                                        }else if (itemOfType is ReferenceField || itemOfType is GroupedDroplistField || itemOfType is LookupField)
                                         {
                                             ReferenceField refField = itemField;
                                             if (includeLinkedIds)
@@ -378,7 +379,7 @@ namespace ContentExportTool
                                                     itemLine += refField.TargetID + "\t";
                                                 }
                                             }
-                                        }else if (FieldTypeManager.GetField(itemField) is MultilistField)
+                                        }else if (itemOfType is MultilistField)
                                         {
                                             MultilistField multiField = itemField;
                                             if (includeLinkedIds)
@@ -430,7 +431,7 @@ namespace ContentExportTool
                                                     itemLine += "\"" + idData + "\"" + "\t";
                                                 }
                                             }
-                                        }else if (FieldTypeManager.GetField(itemField) is CheckboxField)
+                                        }else if (itemOfType is CheckboxField)
                                         {
                                             CheckboxField checkboxField = itemField;
                                             headingString = headingString.Replace(String.Format("{0}-ID", fieldName), string.Empty).Replace(String.Format("{0}-HTML", fieldName), string.Empty);
