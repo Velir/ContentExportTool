@@ -140,6 +140,8 @@ namespace ContentExportTool {
 
         protected global::System.Web.UI.WebControls.Literal litSavedMessage;
 
+        protected global::System.Web.UI.WebControls.Literal litErrorMessage;
+
         /// <summary>
         /// inputTemplates control.
         /// </summary>
