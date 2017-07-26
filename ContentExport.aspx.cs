@@ -789,5 +789,22 @@ namespace ContentExportTool
             chkWorkflowState.Checked = settings.WorkflowState;
             chkAllLanguages.Checked = settings.GetAllLanguages;
         }
+
+        protected void btnClearAll_OnClick(object sender, EventArgs e)
+        {
+            chkIncludeIds.Checked = false;
+            inputStartitem.Value = string.Empty;
+            txtFastQuery.Value = string.Empty;
+            inputTemplates.Value = string.Empty;
+            chkIncludeTemplate.Checked = false;
+            inputFields.Value = string.Empty;
+            chkIncludeLinkedIds.Checked = false;
+            chkIncludeRawHtml.Checked = false;
+            chkWorkflowName.Checked = false;
+            chkWorkflowState.Checked = false;
+            chkAllLanguages.Checked = false;
+            txtSaveSettingsName.Value = string.Empty;
+            ddSavedSettings.SelectedIndex = 0;
+        }
     }
 }

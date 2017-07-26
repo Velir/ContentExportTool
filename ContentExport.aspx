@@ -196,6 +196,16 @@
         .row:not(:last-child) {
             margin-bottom: 5px;
         }
+
+        .btn-clear-all {
+            background: none;
+            border: none;
+            color: brown;
+            margin-top: 10px;
+            font-size: 14px;
+            padding: 0;
+            cursor: pointer;
+        }
     </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script>
@@ -302,7 +312,8 @@
 
                 <div class="main-btns">
                     <div class="left">
-                        <asp:Button runat="server" ID="btnRunExport" OnClick="btnRunExport_OnClick" Text="Run Export" />
+                        <asp:Button runat="server" ID="btnRunExport" OnClick="btnRunExport_OnClick" Text="Run Export" /><br/>
+                        <asp:Button runat="server" ID="btnClearAll" Text="Clear All" OnClick="btnClearAll_OnClick" CssClass="btn-clear-all"/>
                     </div>
 
                     <div class="right">
