@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Script.Serialization;
+using Kofax.com.Common.Helpers;
 using Sitecore.Data;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
@@ -21,6 +22,7 @@ namespace ContentExportTool
             {
                 txtSaveSettingsName.Value = string.Empty;
                 PhBrowseTree.Visible = false;
+                PhBrowseTemplates.Visible = false;
                 var databaseNames = Sitecore.Configuration.Factory.GetDatabaseNames().ToList(); 
                 // make web the default database
                 var webDb = databaseNames.FirstOrDefault(x => x.ToLower().Contains("web"));
@@ -60,6 +62,32 @@ namespace ContentExportTool
             sitecoreTreeHtml += "</ul>";
 
             return sitecoreTreeHtml;
+        }
+
+        protected string GetAvailableTemplates()
+        {
+            var database = ddDatabase.SelectedValue;
+            SetDatabase(database);
+            var startItem = _db.GetItem("/sitecore/templates");
+            var descendants = startItem.Axes.GetDescendants();
+            List<string> templates = (from item in descendants where item.TemplateName == "Template" select item.Name).ToList();
+
+            templates.Sort();
+
+            var html = "<ul>";
+
+            foreach (var template in templates)
+            {
+                html += "<li>";
+                html +=
+                    string.Format(
+                        "<a data-id='{0}' class='template-link' href='javascript:void(0)' onclick='selectTemplate($(this));'>{0}</a>",
+                        template);
+                html += "</li>";
+            }
+
+            html += "</ul>";
+            return html;
         }
 
         protected string GetItemAndChildren(Item item)
@@ -662,6 +690,12 @@ namespace ContentExportTool
             PhBrowseTree.Visible = true;
         }
 
+        protected void btnBrowseTemplates_OnClick(object sender, EventArgs e)
+        {
+            litBrowseTemplates.Text = GetAvailableTemplates();
+            PhBrowseTemplates.Visible = true;
+        }
+
         protected SettingsList ReadSettingsFromFile()
         {
             var serializer = new JavaScriptSerializer();
@@ -927,6 +961,6 @@ namespace ContentExportTool
                 if (line[i] == '"')
                     for (i++; line[i] != '"'; i++) { }
             }
-        }
+        }       
     }
 }

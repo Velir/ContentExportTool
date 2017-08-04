@@ -263,113 +263,57 @@
         .browse-btns {
             margin-top: 10px;
         }
+
+        .select-templates {
+            width: 48%;
+            height: 100%;
+            float: left;
+            overflow: scroll;
+            font-size: 14px;
+        }
+
+        .selected-templates {
+            width: 48%;
+            height: 100%;
+            float: right;
+        }
+
+        .arrows {
+            width: 4%;
+            height: 100%;
+            margin: 0;
+            float: left;
+            background: #eee;
+            font-size: 14px;
+        }
+
+        .temp-selected, .temp-selected-remove {
+            display: none;
+        }
+
+        .modal.browse-modal.templates a.selected, .modal.browse-modal.templates a:hover {
+            font-weight: bold;
+        }
+
+        .modal.browse-modal.templates a {
+            font-weight: normal;
+            font-size: 14px;
+        }
+
+        .browse-btns {
+            padding: 0 20px 20px 0;
+            position: absolute;
+            right: 0;
+            bottom: 0;
+        }
+
+        #btnBrowseTemplates {
+            position: relative;
+            top: -13px;
+        }
     </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $(".advanced-btn").on("click", function () {
-                if ($(this).parent().hasClass("open")) {
-                    $(this).parent().removeClass("open");
-                } else {
-                    $(this).parent().addClass("open");
-                }
-
-                $(".advanced-inner").slideToggle();
-            });
-
-            $(".ddDatabase").on("change", function () {
-                if ($(this).find("option:selected").val() === "custom") {
-                    $(".txtCustomDatabase").show();
-                } else {
-                    $(".txtCustomDatabase").hide();
-                }
-
-                if ($(this).find("option:selected").val() !== "master") {
-                    $(".workflowBox input").each(function () {
-                        $(this).prop("checked", false);
-                    });
-                }
-            });
-
-            $(".workflowBox input").on("change", function () {
-                if ($(this).is(":checked")) {
-                    $(".ddDatabase").val("master");
-                }
-            });
-
-            $(".clear-btn").on("click", function () {
-                var id = $(this).attr("data-id");
-                var input = $("#" + id);
-                $(input).val("");
-                removeSavedMessage();
-            });
-
-            $("#clear-fast-query").on("click", function () {
-                $(".lit-fast-query").html("");
-            });
-
-            $(".show-hints").on("click", function () {
-                $(this).next(".notes").slideToggle();
-            });
-
-            $(".save-btn-decoy").on("click", function () {
-                var saveName = $("#txtSaveSettingsName").val();
-                if (saveName === "") {
-                    $(".error-message").show();
-                    $(".save-settings-box input[type='text']").css("border", "1px solid red");
-                } else {
-                    $("#btnSaveSettings").click();
-                }
-            });
-
-            $("input").on("change", function () {
-                removeSavedMessage();
-            });
-
-            $("select").on("change", function () {
-                removeSavedMessage();
-            });
-        });
-
-        function expandNode(node) {
-            if ($(node).parent().hasClass("expanded")) {
-
-                var children = $(node).parent().find("li");
-                $(children).removeClass("expanded");
-                var childBtns = $(node).parent().find(".browse-expand");
-                $(childBtns).html("+");
-
-                $(node).parent().removeClass("expanded");
-                $(node).html("+");
-            } else {
-                $(node).parent().addClass("expanded");
-                $(node).html("-");
-            }
-        }
-
-        function selectNode(node) {
-            $(".select-node-btn").removeClass("disabled");
-            var nodePath = $(node).attr("data-path");
-            $(".selected-node").html(nodePath);
-        }
-
-        function confirmSelection() {
-            var nodePath = $(".selected-node").html();
-            closeTreeBox();
-            $("#inputStartitem").val(nodePath);
-        }
-
-        function closeTreeBox() {
-            $(".browse-modal").hide();
-        }
-
-        function removeSavedMessage() {
-            $(".save-message").html("");
-        }
-
-
-
-    </script>
+    <script src="ContentExportScripts.js"></script>
 
 </head>
 <body>
@@ -433,6 +377,28 @@
                         </div>
                     </asp:PlaceHolder>
 
+                    <asp:PlaceHolder runat="server" ID="PhBrowseTemplates">
+                        <div class="modal browse-modal templates">
+                            <div class="select-templates">
+                                <asp:Literal runat="server" ID="litBrowseTemplates"></asp:Literal>
+                            </div>
+                            <div class="arrows">
+                                <a class="btn" onclick="addTemplate()">&raquo;</a>
+                                <a class="btn" onclick="removeTemplate()">&laquo;</a>
+                            </div>
+                            <div class="selected-templates">
+                                <span class="temp-selected"></span>
+                                <span class="temp-selected-remove"></span>
+                                <ul class="selected-templates-list">
+                                </ul>
+                                <div class="browse-btns">
+                                    <a href="javascript:void(0)" class="btn disabled select-node-btn" onclick="confirmTemplateSelection();">Select</a>
+                                    <a class="btn close-modal" onclick="closeTemplatesModal()">Cancel</a>
+                                </div>
+                            </div>
+                        </div>
+                    </asp:PlaceHolder>
+
                     <span class="header">Database</span>
                     <asp:DropDownList runat="server" ID="ddDatabase" CssClass="ddDatabase" /><input runat="server" class="txtCustomDatabase" id="txtCustomDatabase" style="display: none" />
                     <br />
@@ -460,7 +426,7 @@
 
                     <span class="header">Templates</span><a class="clear-btn" data-id="inputTemplates">clear</a><br />
                     <span class="notes">Enter template names and/or IDs separated by commas. Items will only be exported if their template is in this list. If this field is left blank, all templates will be included</span><br />
-                    <textarea runat="server" id="inputTemplates" cols="60" row="5"></textarea>
+                    <textarea runat="server" id="inputTemplates" cols="60" row="5"></textarea><asp:Button runat="server" ID="btnBrowseTemplates" OnClick="btnBrowseTemplates_OnClick" CssClass="browse-btn" Text="Browse" />
                     <br />
 
                     <div class="hints">
