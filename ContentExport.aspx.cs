@@ -23,6 +23,7 @@ namespace ContentExportTool
                 txtSaveSettingsName.Value = string.Empty;
                 PhBrowseTree.Visible = false;
                 PhBrowseTemplates.Visible = false;
+                PhBrowseFields.Visible = false;
                 var databaseNames = Sitecore.Configuration.Factory.GetDatabaseNames().ToList(); 
                 // make web the default database
                 var webDb = databaseNames.FirstOrDefault(x => x.ToLower().Contains("web"));
@@ -69,6 +70,7 @@ namespace ContentExportTool
             var database = ddDatabase.SelectedValue;
             SetDatabase(database);
             var startItem = _db.GetItem("/sitecore/templates");
+
             var descendants = startItem.Axes.GetDescendants();
             List<string> templates = (from item in descendants where item.TemplateName == "Template" select item.Name).ToList();
 
@@ -76,17 +78,61 @@ namespace ContentExportTool
 
             var html = "<ul>";
 
-            foreach (var template in templates)
+            html += GetTemplateTree(startItem);
+
+            html += "</ul>";
+            return html;
+        }
+
+        protected string GetAvailableFields()
+        {
+            var database = ddDatabase.SelectedValue;
+            SetDatabase(database);
+
+            string html = "<ul>";
+
+            var templateList = new List<TemplateItem>();
+            var startItem = _db.GetItem("/sitecore/templates");
+            if (!String.IsNullOrEmpty(inputTemplates.Value))
             {
-                html += "<li>";
-                html +=
-                    string.Format(
-                        "<a data-id='{0}' class='template-link' href='javascript:void(0)' onclick='selectTemplate($(this));'>{0}</a>",
-                        template);
+                var templateNames = inputTemplates.Value.Split(',');
+                foreach (var templateName in templateNames.Where(x => !String.IsNullOrEmpty(x)))
+                {
+                    var template =
+                        startItem.Axes.GetDescendants().FirstOrDefault(x => x.Name.ToLower() == templateName.ToLower());
+                    if (template != null)
+                    {
+                        TemplateItem templateItem = _db.GetTemplate(template.ID);
+                        templateList.Add(templateItem);
+                    }
+                }
+            }
+            else
+            {
+                var descendants = startItem.Axes.GetDescendants();
+                var templateItems = (from item in descendants where item.TemplateName == "Template" select item).ToList();
+                templateList.AddRange(templateItems.Select(item => _db.GetTemplate(item.ID)));
+                templateList.OrderBy(x => x.Name);
+            }
+
+            foreach (var template in templateList)
+            {
+                html += "<li class='template-heading'>";
+                html += string.Format("<a class='browse-expand' onclick='expandNode($(this))'>+</a><span>{0}</span>",
+                    template.Name);
+                html += "<ul class='field-list>";
+                foreach (var field in template.Fields)
+                {
+                    html +=
+                        string.Format(
+                            "<li><a class='field-node' href='javascript:void(0)' onclick='selectFieldNode($(this));' data-id='{0}' data-name='{1}'>{1}</a></li>",
+                            field.ID, field.Name);
+                }
                 html += "</li>";
             }
 
             html += "</ul>";
+
             return html;
         }
 
@@ -112,6 +158,44 @@ namespace ContentExportTool
                     nodeHtml += GetItemAndChildren(child);
                 }
                 nodeHtml += "</ul>";
+            }
+
+            nodeHtml += "</li>";
+            return nodeHtml;
+        }
+
+        protected string GetTemplateTree(Item item)
+        {
+            var children = item.GetChildren();
+
+            var nodeHtml = "<li>";
+
+            if (item.TemplateName == "Template")
+            {
+                nodeHtml +=
+                    string.Format(
+                        "<a data-id='{0}' data-name='{1}' class='template-link' href='javascript:void(0)' onclick='selectTemplate($(this));'>{1}</a>",
+                        item.ID, item.Name);
+            }
+            else
+            {
+                if (children.Any())
+                {
+                    nodeHtml += "<a class='browse-expand' onclick='expandNode($(this))'>+</a><span></span>";
+                }
+
+                nodeHtml += string.Format("<span>{0}</span>", item.Name);
+
+                if (children.Any())
+                {
+                    nodeHtml += "<ul>";
+                    foreach (Item child in children)
+                    {
+                        nodeHtml += GetTemplateTree(child);
+                    }
+                    nodeHtml += "</ul>";
+                }
+
             }
 
             nodeHtml += "</li>";
@@ -688,12 +772,24 @@ namespace ContentExportTool
         {
             litSitecoreContentTree.Text = GetSitecoreTreeHtml();
             PhBrowseTree.Visible = true;
+            PhBrowseFields.Visible = false;
+            PhBrowseTemplates.Visible = false;
         }
 
         protected void btnBrowseTemplates_OnClick(object sender, EventArgs e)
         {
             litBrowseTemplates.Text = GetAvailableTemplates();
             PhBrowseTemplates.Visible = true;
+            PhBrowseFields.Visible = false;
+            PhBrowseTree.Visible = false;
+        }
+
+        protected void btnBrowseFields_OnClick(object sender, EventArgs e)
+        {
+            litBrowseFields.Text = GetAvailableFields();
+            PhBrowseFields.Visible = true;
+            PhBrowseTree.Visible = false;
+            PhBrowseTemplates.Visible = false;
         }
 
         protected SettingsList ReadSettingsFromFile()
@@ -961,6 +1057,8 @@ namespace ContentExportTool
                 if (line[i] == '"')
                     for (i++; line[i] != '"'; i++) { }
             }
-        }       
+        }
+
+        
     }
 }

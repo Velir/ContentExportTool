@@ -108,9 +108,9 @@ function selectTemplate(node) {
 
 function addTemplate() {
     var name = $(".temp-selected").html();
-    var node = $(".select-templates a[data-id='" + name + "']");
-    $(node).hide();
-    $(".selected-templates-list").append("<li><a class='addedTemplate' href='javascript:void(0);' onclick='selectAddedTemplate($(this))' data-id='" + name + "' >" + name + "</a></li>");
+    var node = $(".select-templates a[data-name='" + name + "']");
+    $(node).addClass("disabled").removeClass("selected");
+    $(".selected-templates-list").append("<li><a class='addedTemplate' href='javascript:void(0);' onclick='selectAddedTemplate($(this))' data-name='" + name + "' >" + name + "</a></li>");
     $(".temp-selected").html("");
 
     $(".selected-templates .select-node-btn").removeClass("disabled");
@@ -124,10 +124,10 @@ function selectAddedTemplate(node) {
 
 function removeTemplate() {
     var name = $(".temp-selected-remove").html();
-    var node = $(".selected-templates a.addedTemplate[data-id='" + name + "']");
+    var node = $(".selected-templates a.addedTemplate[data-name='" + name + "']");
     $(node).parent().remove();
-    var origNode = $(".select-templates a[data-id='" + name + "']");
-    origNode.show();
+    var origNode = $(".select-templates a[data-name='" + name + "']");
+    origNode.removeClass("disabled");
 
     enableDisableSelect();
 }
@@ -154,4 +154,8 @@ function confirmTemplateSelection() {
 
 function closeTemplatesModal() {
     $(".browse-modal.templates").hide();
+}
+
+function closeFieldsModal() {
+    $(".browse-modal.fields").hide();
 }

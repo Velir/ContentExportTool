@@ -53,6 +53,8 @@ namespace ContentExportTool {
 
         protected global::System.Web.UI.WebControls.Literal litBrowseTemplates;
 
+        protected global::System.Web.UI.WebControls.Literal litBrowseFields;
+
         /// <summary>
         /// btnRunExport control.
         /// </summary>
@@ -235,6 +237,8 @@ namespace ContentExportTool {
         protected global::System.Web.UI.WebControls.PlaceHolder PhBrowseTree;
 
         protected global::System.Web.UI.WebControls.PlaceHolder PhBrowseTemplates;
+
+        protected global::System.Web.UI.WebControls.PlaceHolder PhBrowseFields;
 
         protected global::System.Web.UI.WebControls.PlaceHolder phSaveSettingsPopup;
     }

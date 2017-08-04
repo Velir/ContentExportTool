@@ -264,7 +264,8 @@
             margin-top: 10px;
         }
 
-        .select-templates {
+        .select-templates,
+        .select-fields {
             width: 48%;
             height: 100%;
             float: left;
@@ -272,7 +273,8 @@
             font-size: 14px;
         }
 
-        .selected-templates {
+        .selected-templates,
+        .selected-fields {
             width: 48%;
             height: 100%;
             float: right;
@@ -291,11 +293,13 @@
             display: none;
         }
 
-        .modal.browse-modal.templates a.selected, .modal.browse-modal.templates a:hover {
+        .modal.browse-modal.templates a.selected, .modal.browse-modal.templates a:hover,
+        .modal.browse-modal.fields a.selected, .modal.browse-modal.fields a:hover {
             font-weight: bold;
         }
 
-        .modal.browse-modal.templates a {
+        .modal.browse-modal.templates a
+        .modal.browse-modal.fields a {
             font-weight: normal;
             font-size: 14px;
         }
@@ -307,10 +311,25 @@
             bottom: 0;
         }
 
-        #btnBrowseTemplates {
+        #btnBrowseTemplates,
+        #btnBrowseFields {
             position: relative;
             top: -13px;
         }
+
+        .modal.browse-modal.templates a {
+    font-weight: normal;
+}
+
+.modal.browse-modal.templates span {
+    color: darkgray;
+    margin-left: 5px;
+}
+
+.disabled {
+    pointer-events: none;
+    color: darkgray !important;
+}
     </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="ContentExportScripts.js"></script>
@@ -398,6 +417,28 @@
                             </div>
                         </div>
                     </asp:PlaceHolder>
+                    
+                    <asp:PlaceHolder runat="server" ID="PhBrowseFields">
+                        <div class="modal browse-modal fields">
+                            <div class="select-fields">
+                                <asp:Literal runat="server" ID="litBrowseFields"></asp:Literal>
+                            </div>
+                            <div class="arrows">
+                                <a class="btn" onclick="addTemplate()">&raquo;</a>
+                                <a class="btn" onclick="removeTemplate()">&laquo;</a>
+                            </div>
+                            <div class="selected-fields">
+                                <span class="temp-selected"></span>
+                                <span class="temp-selected-remove"></span>
+                                <ul class="selected-fields-list">
+                                </ul>
+                                <div class="browse-btns">
+                                    <a href="javascript:void(0)" class="btn disabled select-node-btn" onclick="confirmFieldSelection();">Select</a>
+                                    <a class="btn close-modal" onclick="closeFieldModal()">Cancel</a>
+                                </div>
+                            </div>
+                        </div>
+                    </asp:PlaceHolder>
 
                     <span class="header">Database</span>
                     <asp:DropDownList runat="server" ID="ddDatabase" CssClass="ddDatabase" /><input runat="server" class="txtCustomDatabase" id="txtCustomDatabase" style="display: none" />
@@ -442,7 +483,7 @@
 
                     <span class="header">Fields</span><a class="clear-btn" data-id="inputFields">clear</a><br />
                     <span class="notes">Enter field names or IDs separated by commas</span><br />
-                    <textarea runat="server" id="inputFields" cols="60" row="5"></textarea>
+                    <textarea runat="server" id="inputFields" cols="60" row="5"></textarea><asp:Button runat="server" ID="btnBrowseFields" OnClick="btnBrowseFields_OnClick" CssClass="browse-btn" Text="Browse" />
                     <br />
                     <br />
 
