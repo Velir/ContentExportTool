@@ -100,20 +100,20 @@ function removeSavedMessage() {
     $(".save-message").html("");
 }
 
-function selectTemplate(node) {
-    $(".browse-modal.templates a").removeClass("selected");
+function selectBrowseNode(node) {
+    $(".browse-modal a").removeClass("selected");
     $(node).addClass("selected");
     $(".temp-selected").html($(node).html());
 }
 
 function addTemplate() {
     var name = $(".temp-selected").html();
-    var node = $(".select-templates a[data-name='" + name + "']");
+    var node = $(".select-box a[data-name='" + name + "']");
     $(node).addClass("disabled").removeClass("selected");
-    $(".selected-templates-list").append("<li><a class='addedTemplate' href='javascript:void(0);' onclick='selectAddedTemplate($(this))' data-name='" + name + "' >" + name + "</a></li>");
+    $(".selected-box-list").append("<li><a class='addedTemplate' href='javascript:void(0);' onclick='selectAddedTemplate($(this))' data-name='" + name + "' >" + name + "</a></li>");
     $(".temp-selected").html("");
 
-    $(".selected-templates .select-node-btn").removeClass("disabled");
+    $(".selected-box .select-node-btn").removeClass("disabled");
 }
 
 function selectAddedTemplate(node) {
@@ -124,30 +124,23 @@ function selectAddedTemplate(node) {
 
 function removeTemplate() {
     var name = $(".temp-selected-remove").html();
-    var node = $(".selected-templates a.addedTemplate[data-name='" + name + "']");
+    var node = $(".selected-box a.addedTemplate[data-name='" + name + "']");
     $(node).parent().remove();
-    var origNode = $(".select-templates a[data-name='" + name + "']");
+    var origNode = $(".select-box a[data-name='" + name + "']");
     origNode.removeClass("disabled");
 
     enableDisableSelect();
 }
 
 function enableDisableSelect() {
-    var selectedTemplates = $(".selected-templates ul li");
+    var selectedTemplates = $(".selected-box ul li");
     if (selectedTemplates.length < 1) {
-        $(".selected-templates .select-node-btn").addClass("disabled");
+        $(".selected-box .select-node-btn").addClass("disabled");
     }
 }
 
 function confirmTemplateSelection() {
-    var templateString = "";
-    var selectedTemplates = $(".selected-templates ul li");
-    for (var i = 0; i < selectedTemplates.length; i++) {
-        if (i > 0) {
-            templateString += ", ";
-        }
-        templateString += $(selectedTemplates[i]).find("a").html();
-    }
+    var templateString = getSelectedString();
     $("#inputTemplates").html(templateString);
     closeTemplatesModal();
 }
@@ -156,6 +149,35 @@ function closeTemplatesModal() {
     $(".browse-modal.templates").hide();
 }
 
-function closeFieldsModal() {
+function closeFieldModal() {
     $(".browse-modal.fields").hide();
 }
+
+function confirmFieldSelection() {
+    var fieldString = getSelectedString();
+    $("#inputFields").html(fieldString);
+    closeFieldModal();
+
+}
+
+function getSelectedString() {
+    var selectedString = "";
+    var selectedItems = $(".selected-box ul li");
+    for (var i = 0; i < selectedItems.length; i++) {
+        if (i > 0) {
+            selectedString += ", ";
+        }
+        selectedString += $(selectedItems[i]).find("a").html();
+    }
+    return selectedString;
+}
+
+function selectAllFields(node) {
+    var fields = $(node).next().find("li");
+    for (var i = 0; i < fields.length; i++) {
+        var fieldNode = $($(fields)[i]).find("a");
+        $(".temp-selected").html($(fieldNode).html());
+        addTemplate();
+    }
+}
+

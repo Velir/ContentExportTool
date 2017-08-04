@@ -264,17 +264,17 @@
             margin-top: 10px;
         }
 
-        .select-templates,
-        .select-fields {
+        .select-box,
+        .select-box {
             width: 48%;
             height: 100%;
             float: left;
-            overflow: scroll;
+            overflow: auto;
             font-size: 14px;
         }
 
-        .selected-templates,
-        .selected-fields {
+        .selected-box,
+        .selected-box {
             width: 48%;
             height: 100%;
             float: right;
@@ -298,8 +298,7 @@
             font-weight: bold;
         }
 
-        .modal.browse-modal.templates a
-        .modal.browse-modal.fields a {
+        .modal.browse-modal.templates a .modal.browse-modal.fields a {
             font-weight: normal;
             font-size: 14px;
         }
@@ -318,18 +317,51 @@
         }
 
         .modal.browse-modal.templates a {
-    font-weight: normal;
-}
+            font-weight: normal;
+        }
 
-.modal.browse-modal.templates span {
-    color: darkgray;
-    margin-left: 5px;
-}
+        .modal.browse-modal.templates span {
+            color: darkgray;
+            margin-left: 5px;
+        }
 
-.disabled {
-    pointer-events: none;
-    color: darkgray !important;
-}
+        .disabled {
+            pointer-events: none;
+            color: darkgray !important;
+        }
+
+        .browse-modal li span {
+            margin-left: 10px;
+            color: darkgray;
+        }
+
+        .modal.browse-modal.fields a {
+            font-weight: normal;
+        }
+
+        .modal.browse-modal a.select-all {
+            font-size: 12px;
+            margin-left: 5px;
+            color: brown;
+            cursor: pointer;
+        }
+
+        ul.selected-box-list a {
+            font-size: 14px;
+        }
+
+        ul.selected-box-list {
+            max-height: 90%;
+            overflow-y: auto;
+            width: 100%;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .modal.browse-modal ul.selected-box-list li {
+            left: 0;
+            padding-left: 10px;
+        }
     </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="ContentExportScripts.js"></script>
@@ -398,17 +430,17 @@
 
                     <asp:PlaceHolder runat="server" ID="PhBrowseTemplates">
                         <div class="modal browse-modal templates">
-                            <div class="select-templates">
+                            <div class="select-box">
                                 <asp:Literal runat="server" ID="litBrowseTemplates"></asp:Literal>
                             </div>
                             <div class="arrows">
                                 <a class="btn" onclick="addTemplate()">&raquo;</a>
                                 <a class="btn" onclick="removeTemplate()">&laquo;</a>
                             </div>
-                            <div class="selected-templates">
+                            <div class="selected-box">
                                 <span class="temp-selected"></span>
                                 <span class="temp-selected-remove"></span>
-                                <ul class="selected-templates-list">
+                                <ul class="selected-box-list">
                                 </ul>
                                 <div class="browse-btns">
                                     <a href="javascript:void(0)" class="btn disabled select-node-btn" onclick="confirmTemplateSelection();">Select</a>
@@ -417,20 +449,20 @@
                             </div>
                         </div>
                     </asp:PlaceHolder>
-                    
+
                     <asp:PlaceHolder runat="server" ID="PhBrowseFields">
                         <div class="modal browse-modal fields">
-                            <div class="select-fields">
+                            <div class="select-box">
                                 <asp:Literal runat="server" ID="litBrowseFields"></asp:Literal>
                             </div>
                             <div class="arrows">
                                 <a class="btn" onclick="addTemplate()">&raquo;</a>
                                 <a class="btn" onclick="removeTemplate()">&laquo;</a>
                             </div>
-                            <div class="selected-fields">
+                            <div class="selected-box">
                                 <span class="temp-selected"></span>
                                 <span class="temp-selected-remove"></span>
-                                <ul class="selected-fields-list">
+                                <ul class="selected-box-list">
                                 </ul>
                                 <div class="browse-btns">
                                     <a href="javascript:void(0)" class="btn disabled select-node-btn" onclick="confirmFieldSelection();">Select</a>

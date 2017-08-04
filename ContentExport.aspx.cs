@@ -17,14 +17,14 @@ namespace ContentExportTool
         private string _settingsFilePath = AppDomain.CurrentDomain.BaseDirectory + @"\sitecore\admin\ContentExportSettings.txt";
 
         protected void Page_Load(object sender, EventArgs e)
-        {  
+        {
             if (!IsPostBack)
             {
                 txtSaveSettingsName.Value = string.Empty;
                 PhBrowseTree.Visible = false;
                 PhBrowseTemplates.Visible = false;
                 PhBrowseFields.Visible = false;
-                var databaseNames = Sitecore.Configuration.Factory.GetDatabaseNames().ToList(); 
+                var databaseNames = Sitecore.Configuration.Factory.GetDatabaseNames().ToList();
                 // make web the default database
                 var webDb = databaseNames.FirstOrDefault(x => x.ToLower().Contains("web"));
                 if (webDb != null)
@@ -99,36 +99,45 @@ namespace ContentExportTool
                 foreach (var templateName in templateNames.Where(x => !String.IsNullOrEmpty(x)))
                 {
                     var template =
-                        startItem.Axes.GetDescendants().FirstOrDefault(x => x.Name.ToLower() == templateName.ToLower());
+                        startItem.Axes.GetDescendants().Where(x => x.TemplateName == "Template").FirstOrDefault(x => x.Name.ToLower() == templateName.Trim().ToLower());
                     if (template != null)
                     {
                         TemplateItem templateItem = _db.GetTemplate(template.ID);
-                        templateList.Add(templateItem);
+                        if (templateItem != null)
+                        {
+                            templateList.Add(templateItem);
+                        }
                     }
                 }
             }
             else
             {
-                var descendants = startItem.Axes.GetDescendants();
-                var templateItems = (from item in descendants where item.TemplateName == "Template" select item).ToList();
+                var templateItems = startItem.Axes.GetDescendants().Where(x => x.TemplateName == "Template");
                 templateList.AddRange(templateItems.Select(item => _db.GetTemplate(item.ID)));
-                templateList.OrderBy(x => x.Name);
+                templateList = templateList.OrderBy(x => x.Name).ToList();
             }
 
             foreach (var template in templateList)
             {
-                html += "<li class='template-heading'>";
-                html += string.Format("<a class='browse-expand' onclick='expandNode($(this))'>+</a><span>{0}</span>",
-                    template.Name);
-                html += "<ul class='field-list>";
-                foreach (var field in template.Fields)
+                var fields = template.Fields.Where(x => x.Name[0] != '_');
+                fields = fields.OrderBy(x => x.Name);
+                if (fields.Any())
                 {
-                    html +=
-                        string.Format(
-                            "<li><a class='field-node' href='javascript:void(0)' onclick='selectFieldNode($(this));' data-id='{0}' data-name='{1}'>{1}</a></li>",
-                            field.ID, field.Name);
+                    html += "<li class='template-heading'>";
+                    html += string.Format(
+                        "<a class='browse-expand' onclick='expandNode($(this))'>+</a><span>{0}</span><a class='select-all' href='javascript:void(0)' onclick='selectAllFields($(this))'>select all</a>",
+                        template.Name);
+                    html += "<ul class='field-list'>";
+                    foreach (var field in fields)
+                    {
+                        html +=
+                            string.Format(
+                                "<li><a class='field-node' href='javascript:void(0)' onclick='selectBrowseNode($(this));' data-id='{0}' data-name='{1}'>{1}</a></li>",
+                                field.ID, field.Name);
+                    }
+                    html += "</ul>";
+                    html += "</li>";
                 }
-                html += "</li>";
             }
 
             html += "</ul>";
@@ -149,7 +158,7 @@ namespace ContentExportTool
 
             nodeHtml += string.Format("<a class='sitecore-node' href='javascript:void(0)' onclick='selectNode($(this));' data-path='{0}'>{1}</a>", item.Paths.Path, item.Name);
 
-           
+
             if (children.Any())
             {
                 nodeHtml += "<ul>";
@@ -174,7 +183,7 @@ namespace ContentExportTool
             {
                 nodeHtml +=
                     string.Format(
-                        "<a data-id='{0}' data-name='{1}' class='template-link' href='javascript:void(0)' onclick='selectTemplate($(this));'>{1}</a>",
+                        "<a data-id='{0}' data-name='{1}' class='template-link' href='javascript:void(0)' onclick='selectBrowseNode($(this));'>{1}</a>",
                         item.ID, item.Name);
             }
             else
@@ -240,14 +249,14 @@ namespace ContentExportTool
 
                 var includeWorkflowState = chkWorkflowState.Checked;
                 var includeworkflowName = chkWorkflowName.Checked;
-               
+
                 if (!SetDatabase())
                 {
                     litFeedback.Text = "You must enter a custom database name, or select a database from the dropdown";
                     return;
                 }
 
-                
+
                 if (_db == null)
                 {
                     litFeedback.Text = "Invalid database. Selected database does not exist.";
@@ -261,7 +270,7 @@ namespace ContentExportTool
                 var includeRawHtml = chkIncludeRawHtml.Checked;
                 var includeTemplate = chkIncludeTemplate.Checked;
 
-                   var allLanguages = chkAllLanguages.Checked;               
+                var allLanguages = chkAllLanguages.Checked;
 
                 var templateString = inputTemplates.Value;
                 var templates = templateString.ToLower().Split(',').Select(x => x.Trim());
@@ -284,8 +293,8 @@ namespace ContentExportTool
                     var descendants = startItem.Axes.GetDescendants();
                     exportItems.Add(startItem);
                     exportItems.AddRange(descendants);
-                }                              
-             
+                }
+
                 List<Item> items = new List<Item>();
                 if (!String.IsNullOrEmpty(templateString))
                 {
@@ -308,12 +317,12 @@ namespace ContentExportTool
 
                 using (StringWriter sw = new StringWriter())
                 {
-                    var headingString = "Item Path\t" + (includeIds ? "Item ID\t" : string.Empty) 
+                    var headingString = "Item Path\t" + (includeIds ? "Item ID\t" : string.Empty)
                     + (includeTemplate ? "Template\t" : string.Empty)
                     + (allLanguages ? "Language\t" : string.Empty)
                     + GetExcelHeaderForFields(fields, includeLinkedIds, includeRawHtml)
                     + (includeworkflowName ? "Workflow\t" : string.Empty)
-                    + (includeWorkflowState ? "Workflow State\t" : string.Empty );
+                    + (includeWorkflowState ? "Workflow State\t" : string.Empty);
 
                     var dataLines = new List<string>();
 
@@ -422,7 +431,8 @@ namespace ContentExportTool
                                                     itemLine += imageField.Value + "\t";
                                                 }
                                             }
-                                        }else if (itemOfType is LinkField)
+                                        }
+                                        else if (itemOfType is LinkField)
                                         {
                                             LinkField linkField = itemField;
                                             if (includeLinkedIds)
@@ -451,7 +461,8 @@ namespace ContentExportTool
                                                     itemLine += linkField.Value + "\t";
                                                 }
                                             }
-                                        }else if (itemOfType is ReferenceField || itemOfType is GroupedDroplistField || itemOfType is LookupField)
+                                        }
+                                        else if (itemOfType is ReferenceField || itemOfType is GroupedDroplistField || itemOfType is LookupField)
                                         {
                                             ReferenceField refField = itemField;
                                             if (includeLinkedIds)
@@ -486,7 +497,8 @@ namespace ContentExportTool
                                                     itemLine += refField.TargetID + "\t";
                                                 }
                                             }
-                                        }else if (itemOfType is MultilistField)
+                                        }
+                                        else if (itemOfType is MultilistField)
                                         {
                                             MultilistField multiField = itemField;
                                             if (includeLinkedIds)
@@ -538,7 +550,8 @@ namespace ContentExportTool
                                                     itemLine += "\"" + idData + "\"" + "\t";
                                                 }
                                             }
-                                        }else if (itemOfType is CheckboxField)
+                                        }
+                                        else if (itemOfType is CheckboxField)
                                         {
                                             CheckboxField checkboxField = itemField;
                                             headingString = headingString.Replace(String.Format("{0}-ID", fieldName), string.Empty).Replace(String.Format("{0}-HTML", fieldName), string.Empty);
@@ -555,10 +568,10 @@ namespace ContentExportTool
                                         {
                                             itemLine += RemoveLineEndings(itemField.Value) + "\t";
                                             headingString = headingString.Replace(String.Format("{0}-ID", fieldName), string.Empty).Replace(String.Format("{0}-HTML", fieldName), string.Empty);
-                                        }                                       
+                                        }
                                     }
                                 }
-                            }                          
+                            }
 
                             if (includeWorkflowState || includeworkflowName)
                             {
@@ -601,7 +614,7 @@ namespace ContentExportTool
                             }
 
                             dataLines.Add(itemLine);
-                        }                                                             
+                        }
                     }
 
                     // remove any field-ID and field-RAW from header that haven't been replaced (i.e. non-existent field)
@@ -765,7 +778,7 @@ namespace ContentExportTool
             {
                 litFastQueryTest.Text = "Error: " + ex.Message;
             }
-            
+
         }
 
         protected void btnBrowse_OnClick(object sender, EventArgs e)
@@ -835,7 +848,7 @@ namespace ContentExportTool
 
             var serializer = new JavaScriptSerializer();
 
-            var savedSettings = ReadSettingsFromFile();           
+            var savedSettings = ReadSettingsFromFile();
 
             if (savedSettings == null)
             {
@@ -1014,11 +1027,11 @@ namespace ContentExportTool
                                             else if (itemOfType is MultilistField)
                                             {
                                                 // this requires using item IDs
-                                                MultilistField multiField = itemField;                                              
+                                                MultilistField multiField = itemField;
                                             }
                                             else if (itemOfType is CheckboxField)
                                             {
-                                                CheckboxField checkboxField = itemField;                                                
+                                                CheckboxField checkboxField = itemField;
                                             }
                                             else // default text field
                                             {
@@ -1040,8 +1053,8 @@ namespace ContentExportTool
                     litImportMessage.Text = "An error occurred. Please check the logs for more info";
                 }
             }
-            
-            
+
+
         }
 
         protected IEnumerable<string> LineParser(string line)
@@ -1059,6 +1072,6 @@ namespace ContentExportTool
             }
         }
 
-        
+
     }
 }
