@@ -142,6 +142,10 @@ namespace ContentExportTool {
 
         protected global::System.Web.UI.WebControls.Literal litErrorMessage;
 
+        protected global::System.Web.UI.WebControls.Literal litImportMessage;
+
+        protected global::System.Web.UI.WebControls.FileUpload btnUploadImportFile;
+
         /// <summary>
         /// inputTemplates control.
         /// </summary>
@@ -213,7 +217,10 @@ namespace ContentExportTool {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnRunExportDupe;
-        
+
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnRunImport;
+
         /// <summary>
         /// btnWebformsExport control.
         /// </summary>

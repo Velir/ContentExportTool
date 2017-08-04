@@ -2,12 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
 using Sitecore.Data;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
-using Sitecore.Form.Web.UI.Controls;
+using Sitecore.Diagnostics;
 
 namespace ContentExportTool
 {
@@ -74,7 +73,7 @@ namespace ContentExportTool
                 nodeHtml += "<a class='browse-expand' onclick='expandNode($(this))'>+</a>";
             }
 
-            nodeHtml += string.Format("<a class='sitecore-node' data-path='{0}'>{1}</a>", item.Paths.Path, item.Name);
+            nodeHtml += string.Format("<a class='sitecore-node' href='javascript:void(0)' onclick='selectNode($(this));' data-path='{0}'>{1}</a>", item.Paths.Path, item.Name);
 
            
             if (children.Any())
@@ -104,14 +103,10 @@ namespace ContentExportTool
             {
                 databaseName = "master";
             }
-            else if (databaseName == "custom")
-            {
-                databaseName = txtCustomDatabase.Value;
-            }
 
             if (String.IsNullOrEmpty(databaseName))
             {
-                return false;
+                databaseName = "master";
             }
 
             _db = Sitecore.Configuration.Factory.GetDatabase(databaseName);
@@ -201,7 +196,7 @@ namespace ContentExportTool
 
                 using (StringWriter sw = new StringWriter())
                 {
-                    var headingString = "Item\t" + (includeIds ? "Item ID\t" : string.Empty) 
+                    var headingString = "Item Path\t" + (includeIds ? "Item ID\t" : string.Empty) 
                     + (includeTemplate ? "Template\t" : string.Empty)
                     + (allLanguages ? "Language\t" : string.Empty)
                     + GetExcelHeaderForFields(fields, includeLinkedIds, includeRawHtml)
@@ -806,6 +801,132 @@ namespace ContentExportTool
             chkAllLanguages.Checked = false;
             txtSaveSettingsName.Value = string.Empty;
             ddSavedSettings.SelectedIndex = 0;
+        }
+
+        protected void btnRunImport_OnClick(object sender, EventArgs e)
+        {
+            if (!btnUploadImportFile.HasFile)
+            {
+                litImportMessage.Text = "You must upload a file";
+                return;
+            }
+
+            SetDatabase();
+
+            List<string> headings = new List<string>();
+
+            Stream stream = btnUploadImportFile.FileContent;
+            using (StreamReader sr = new StreamReader(stream))
+            {
+                try
+                {
+                    string line;
+                    int itemPathIndex = 0;
+                    var isHeader = true;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        var cells = LineParser(line).ToList();
+                        if (isHeader)
+                        {
+                            var index = 0;
+                            foreach (var cell in cells)
+                            {
+                                headings.Add(cell);
+                                if (cell.ToLower() == ("item path") || cell.ToLower() == ("item id"))
+                                {
+                                    itemPathIndex = index;
+                                }
+                                index++;
+                            }
+                            isHeader = false;
+                        }
+                        else
+                        {
+                            int index = 0;
+                            // first, get path cell to get item
+                            var itemPath = cells[itemPathIndex];
+                            var item = _db.GetItem(itemPath);
+                            if (item != null)
+                            {
+                                item.Editing.BeginEdit();
+                                foreach (var cell in cells)
+                                {
+                                    // ignore the item path
+                                    if (index != itemPathIndex)
+                                    {
+                                        var fieldName = headings[index];
+                                        var itemField = item.Fields[fieldName];
+                                        if (itemField != null)
+                                        {
+                                            // determine type of field
+                                            var itemOfType = FieldTypeManager.GetField(itemField);
+
+                                            if (itemOfType is ImageField) // if image field
+                                            {
+                                                ImageField imageField = itemField;
+                                                imageField.Clear();
+                                                var mediaPath = cell;
+                                                var mediaItem = _db.GetItem(mediaPath);
+                                                imageField.MediaID = mediaItem.ID;
+                                                imageField.MediaPath = mediaPath;
+                                            }
+                                            else if (itemOfType is LinkField)
+                                            {
+                                                LinkField linkField = itemField;
+                                                linkField.Clear();
+                                                linkField.Url = cell;
+                                            }
+                                            else if (itemOfType is ReferenceField || itemOfType is GroupedDroplistField || itemOfType is LookupField)
+                                            {
+                                                // this requires using item IDs
+                                                ReferenceField refField = itemField;
+                                            }
+                                            else if (itemOfType is MultilistField)
+                                            {
+                                                // this requires using item IDs
+                                                MultilistField multiField = itemField;                                              
+                                            }
+                                            else if (itemOfType is CheckboxField)
+                                            {
+                                                CheckboxField checkboxField = itemField;                                                
+                                            }
+                                            else // default text field
+                                            {
+                                                itemField.Value = cell;
+                                            }
+                                        }
+                                    }
+                                    index++;
+                                }
+                                item.Editing.EndEdit();
+                            }
+                        }
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Info(ex.Message, this);
+                    litImportMessage.Text = "An error occurred. Please check the logs for more info";
+                }
+            }
+            
+            
+        }
+
+        protected IEnumerable<string> LineParser(string line)
+        {
+            int fieldStart = 0;
+            for (int i = 0; i < line.Length; i++)
+            {
+                if (line[i] == ',')
+                {
+                    yield return line.Substring(fieldStart, i - fieldStart);
+                    fieldStart = i + 1;
+                }
+                if (line[i] == '"')
+                    for (i++; line[i] != '"'; i++) { }
+            }
         }
     }
 }
