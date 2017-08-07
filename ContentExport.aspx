@@ -124,6 +124,7 @@
         .modal.browse-modal ul {
             list-style: none;
             width: 100%;
+            margin-top: 0;
         }
 
             .modal.browse-modal ul li {
@@ -264,13 +265,13 @@
             margin-top: 10px;
         }
 
-        .select-box,
         .select-box {
             width: 48%;
             height: 100%;
             float: left;
             overflow: auto;
             font-size: 14px;
+            position: relative;
         }
 
         .selected-box,
@@ -361,6 +362,46 @@
         .modal.browse-modal ul.selected-box-list li {
             left: 0;
             padding-left: 10px;
+        }
+
+        .arrows .btn {
+            position: relative;
+            top: 150px;
+            margin-bottom: 10px;
+        }
+
+        input.field-search {
+            width: 94%;
+            display: inline-block;
+            margin-bottom: 10px;
+            max-width: none;
+            padding: 4px 16px 2px 5px;
+            border: none;
+            border-bottom: 1px solid #ccc;
+        }
+
+        ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+          font-style:italic;
+        }
+        ::-moz-placeholder { /* Firefox 19+ */
+          font-style:italic;
+        }
+        :-ms-input-placeholder { /* IE 10+ */
+          font-style:italic;
+        }
+        :-moz-placeholder { /* Firefox 18- */
+          font-style:italic;
+        }
+
+        a.clear-search {
+            position: absolute;
+            right: 2px;
+            top: 2px;
+            color: darkgray !important;
+        }
+
+        li.hidden {
+            display: none;
         }
     </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -453,6 +494,8 @@
                     <asp:PlaceHolder runat="server" ID="PhBrowseFields">
                         <div class="modal browse-modal fields">
                             <div class="select-box">
+                                <input class="field-search" type="text" placeholder="search" onkeyup="browseSearch($(this))"/>
+                                <a class="clear-search" href="javascript:void(0)" onclick="clearSearch($(this))">X</a>
                                 <asp:Literal runat="server" ID="litBrowseFields"></asp:Literal>
                             </div>
                             <div class="arrows">
@@ -483,7 +526,7 @@
                     <br />
 
                     <span class="header">Start Item</span><a class="clear-btn" data-id="inputStartitem">clear</a><br />
-                    <span class="notes">Enter the path or ID of the starting node. Only content beneath and including this node will be exported. If field is left blank, the starting node will be /sitecore/content</span><br />
+                    <span class="notes">Enter the path or ID of the starting node, or use Browse to select.<br/> Only content beneath and including this node will be exported. If field is left blank, the starting node will be /sitecore/content.</span><br />
                     <input runat="server" id="inputStartitem" /><asp:Button runat="server" ID="btnBrowse" OnClick="btnBrowse_OnClick" CssClass="browse-btn" Text="Browse" />
                     <br />
                     <span>OR</span><br />
@@ -498,7 +541,7 @@
                     <br />
 
                     <span class="header">Templates</span><a class="clear-btn" data-id="inputTemplates">clear</a><br />
-                    <span class="notes">Enter template names and/or IDs separated by commas. Items will only be exported if their template is in this list. If this field is left blank, all templates will be included</span><br />
+                    <span class="notes">Enter template names and/or IDs separated by commas, or use Browse to select. <br/>Items will only be exported if their template is in this list. If this field is left blank, all templates will be included.</span><br />
                     <textarea runat="server" id="inputTemplates" cols="60" row="5"></textarea><asp:Button runat="server" ID="btnBrowseTemplates" OnClick="btnBrowseTemplates_OnClick" CssClass="browse-btn" Text="Browse" />
                     <br />
 
@@ -514,7 +557,7 @@
 
 
                     <span class="header">Fields</span><a class="clear-btn" data-id="inputFields">clear</a><br />
-                    <span class="notes">Enter field names or IDs separated by commas</span><br />
+                    <span class="notes">Enter field names or IDs separated by commas, or use Browse to select fields.</span><br />
                     <textarea runat="server" id="inputFields" cols="60" row="5"></textarea><asp:Button runat="server" ID="btnBrowseFields" OnClick="btnBrowseFields_OnClick" CssClass="browse-btn" Text="Browse" />
                     <br />
                     <br />

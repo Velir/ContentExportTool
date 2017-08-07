@@ -123,7 +123,7 @@ namespace ContentExportTool
                 fields = fields.OrderBy(x => x.Name);
                 if (fields.Any())
                 {
-                    html += "<li class='template-heading'>";
+                    html += "<li data-name='" + template.Name + "' class='template-heading'>";
                     html += string.Format(
                         "<a class='browse-expand' onclick='expandNode($(this))'>+</a><span>{0}</span><a class='select-all' href='javascript:void(0)' onclick='selectAllFields($(this))'>select all</a>",
                         template.Name);
@@ -132,7 +132,7 @@ namespace ContentExportTool
                     {
                         html +=
                             string.Format(
-                                "<li><a class='field-node' href='javascript:void(0)' onclick='selectBrowseNode($(this));' data-id='{0}' data-name='{1}'>{1}</a></li>",
+                                "<li data-name='{1}'><a class='field-node' href='javascript:void(0)' onclick='selectBrowseNode($(this));' data-id='{0}' data-name='{1}'>{1}</a></li>",
                                 field.ID, field.Name);
                     }
                     html += "</ul>";

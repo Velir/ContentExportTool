@@ -181,3 +181,49 @@ function selectAllFields(node) {
     }
 }
 
+function browseSearch(searchbar) {
+    var term = $(searchbar).val();
+    var lis = $(".browse-modal .select-box > ul > li");
+    for (var i = 0; i < lis.length; i++) {
+        recursiveTreeSearch(lis[i], term);
+    }
+}
+
+function recursiveTreeSearch(li, search) {
+    search = search.toLowerCase();
+    var value = $(li).attr("data-name").toLowerCase();
+    if (value.indexOf(search) > -1) {
+        $(li).removeClass("hidden");
+        // expand all parents
+        if ($(li).hasClass("expanded")) {
+            $(li).find("a.browse-expand").click();
+        }
+        var parents = $(li).parents("li");
+        for (var j = 0; j < parents.length; j++) {
+            $(parents[j]).removeClass("hidden");
+            if (!$(parents[j]).hasClass("expanded")) {
+                $(parents[j]).find("a.browse-expand").click();
+            }
+        }
+    } else {
+        $(li).addClass("hidden");
+        if ($(li).hasClass("expanded")) {
+            $(li).find("a.browse-expand").click();
+        }
+        var children = $(li).find("li");
+        for (var i = 0; i < children.length; i++) {
+            recursiveTreeSearch(children[i], search);
+        }
+    }
+}
+
+function clearSearch(btn) {
+    var searchbar = $(btn).parent().find("input.field-search");
+    $(searchbar).val("");
+    var expanded = $("li.expanded");
+    for (var i = 0; i < expanded.length; i++) {
+        $(expanded[i]).find("a.browse-expand").click();
+    }
+    $(".browse-modal li").removeClass("hidden");
+}
+
