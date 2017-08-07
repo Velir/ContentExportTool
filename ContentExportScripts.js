@@ -183,21 +183,11 @@ function selectAllFields(node) {
 
 function browseSearch(searchbar) {
     var term = $(searchbar).val();
-    var lis = $(".browse-modal .select-box > ul > li");
-    for (var i = 0; i < lis.length; i++) {
-        recursiveTreeSearch(lis[i], term);
-    }
-}
-
-function recursiveTreeSearch(li, search) {
-    search = search.toLowerCase();
-    var value = $(li).attr("data-name").toLowerCase();
-    if (value.indexOf(search) > -1) {
+    $(".browse-modal .left li").addClass("hidden");
+    var list = $(".browse-modal li[data-name*='" + term + "']");
+    for (var i = 0; i < list.length; i++) {
+        var li = list[i];
         $(li).removeClass("hidden");
-        // expand all parents
-        if ($(li).hasClass("expanded")) {
-            $(li).find("a.browse-expand").click();
-        }
         var parents = $(li).parents("li");
         for (var j = 0; j < parents.length; j++) {
             $(parents[j]).removeClass("hidden");
@@ -205,16 +195,12 @@ function recursiveTreeSearch(li, search) {
                 $(parents[j]).find("a.browse-expand").click();
             }
         }
-    } else {
-        $(li).addClass("hidden");
-        if ($(li).hasClass("expanded")) {
-            $(li).find("a.browse-expand").click();
-        }
-        var children = $(li).find("li");
-        for (var i = 0; i < children.length; i++) {
-            recursiveTreeSearch(children[i], search);
-        }
     }
+}
+
+function clearModalSelections() {
+    $(".selected-box-list").empty();
+    $(".browse-modal .left a.disabled").removeClass("disabled");
 }
 
 function clearSearch(btn) {

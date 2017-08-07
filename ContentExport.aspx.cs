@@ -123,7 +123,7 @@ namespace ContentExportTool
                 fields = fields.OrderBy(x => x.Name);
                 if (fields.Any())
                 {
-                    html += "<li data-name='" + template.Name + "' class='template-heading'>";
+                    html += "<li data-name='" + template.Name.ToLower() + "' class='template-heading'>";
                     html += string.Format(
                         "<a class='browse-expand' onclick='expandNode($(this))'>+</a><span>{0}</span><a class='select-all' href='javascript:void(0)' onclick='selectAllFields($(this))'>select all</a>",
                         template.Name);
@@ -132,8 +132,8 @@ namespace ContentExportTool
                     {
                         html +=
                             string.Format(
-                                "<li data-name='{1}'><a class='field-node' href='javascript:void(0)' onclick='selectBrowseNode($(this));' data-id='{0}' data-name='{1}'>{1}</a></li>",
-                                field.ID, field.Name);
+                                "<li data-name='{2}'><a class='field-node' href='javascript:void(0)' onclick='selectBrowseNode($(this));' data-id='{0}' data-name='{1}'>{1}</a></li>",
+                                field.ID, field.Name, field.Name.ToLower());
                     }
                     html += "</ul>";
                     html += "</li>";
@@ -149,7 +149,7 @@ namespace ContentExportTool
         {
             var children = item.GetChildren().Cast<Item>();
 
-            var nodeHtml = "<li>";
+            var nodeHtml = "<li data-name='" + item.Name.ToLower() + "'>";
 
             if (children.Any())
             {
@@ -177,7 +177,7 @@ namespace ContentExportTool
         {
             var children = item.GetChildren();
 
-            var nodeHtml = "<li>";
+            var nodeHtml = "<li data-name='" + item.Name.ToLower() + "'>";
 
             if (item.TemplateName == "Template")
             {

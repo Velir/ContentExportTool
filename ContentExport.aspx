@@ -119,6 +119,7 @@
             display: inline-block;
             width: 250px;
             height: 100%;
+            position: relative;
         }
 
         .modal.browse-modal ul {
@@ -142,9 +143,12 @@
 
         .modal.browse-modal a {
             cursor: pointer;
-            font-weight: bold;
             text-decoration: none;
             color: black;
+        }
+
+        .modal.browse-modal a:hover {
+            font-weight: bold;
         }
 
         .modal.browse-modal .browse-expand {
@@ -154,6 +158,7 @@
 
         .modal.browse-modal .sitecore-node {
             margin-left: 12px;
+            display: block;
         }
 
         .main-btns .right {
@@ -274,11 +279,16 @@
             position: relative;
         }
 
-        .selected-box,
+        .selector-box {
+            position: relative;
+            font-size: 14px;
+        }
+
         .selected-box {
             width: 48%;
             height: 100%;
             float: right;
+            position: relative;
         }
 
         .arrows {
@@ -309,6 +319,8 @@
             position: absolute;
             right: 0;
             bottom: 0;
+            text-align: right;
+            width: 90%;
         }
 
         #btnBrowseTemplates,
@@ -403,6 +415,10 @@
         li.hidden {
             display: none;
         }
+
+        .clear-selections {
+            float: left;
+        }
     </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="ContentExportScripts.js"></script>
@@ -453,7 +469,9 @@
 
                     <asp:PlaceHolder runat="server" ID="PhBrowseTree">
                         <div class="modal browse-modal">
-                            <div class="selector-box">
+                            <div class="selector-box left">
+                                <input class="field-search" type="text" placeholder="search" onkeyup="browseSearch($(this))"/>
+                                <a class="clear-search" href="javascript:void(0)" onclick="clearSearch($(this))">X</a>
                                 <asp:Literal runat="server" ID="litSitecoreContentTree"></asp:Literal>
                             </div>
                             <div class="selection-box">
@@ -471,7 +489,9 @@
 
                     <asp:PlaceHolder runat="server" ID="PhBrowseTemplates">
                         <div class="modal browse-modal templates">
-                            <div class="select-box">
+                            <div class="select-box left">
+                                <input class="field-search" type="text" placeholder="search" onkeyup="browseSearch($(this))"/>
+                                <a class="clear-search" href="javascript:void(0)" onclick="clearSearch($(this))">X</a>
                                 <asp:Literal runat="server" ID="litBrowseTemplates"></asp:Literal>
                             </div>
                             <div class="arrows">
@@ -484,6 +504,7 @@
                                 <ul class="selected-box-list">
                                 </ul>
                                 <div class="browse-btns">
+                                    <a href="javascript:void" class="btn clear-selections" onclick="clearModalSelections();">Clear</a>
                                     <a href="javascript:void(0)" class="btn disabled select-node-btn" onclick="confirmTemplateSelection();">Select</a>
                                     <a class="btn close-modal" onclick="closeTemplatesModal()">Cancel</a>
                                 </div>
@@ -493,7 +514,7 @@
 
                     <asp:PlaceHolder runat="server" ID="PhBrowseFields">
                         <div class="modal browse-modal fields">
-                            <div class="select-box">
+                            <div class="select-box left">
                                 <input class="field-search" type="text" placeholder="search" onkeyup="browseSearch($(this))"/>
                                 <a class="clear-search" href="javascript:void(0)" onclick="clearSearch($(this))">X</a>
                                 <asp:Literal runat="server" ID="litBrowseFields"></asp:Literal>
@@ -508,6 +529,7 @@
                                 <ul class="selected-box-list">
                                 </ul>
                                 <div class="browse-btns">
+                                    <a href="javascript:void" class="btn clear-selections" onclick="clearModalSelections();">Clear</a>
                                     <a href="javascript:void(0)" class="btn disabled select-node-btn" onclick="confirmFieldSelection();">Select</a>
                                     <a class="btn close-modal" onclick="closeFieldModal()">Cancel</a>
                                 </div>
