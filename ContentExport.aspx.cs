@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Script.Serialization;
-using Kofax.com.Common.Helpers;
 using Sitecore.Data;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
-using Sitecore.Diagnostics;
 
 namespace ContentExportTool
 {
@@ -18,6 +16,8 @@ namespace ContentExportTool
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            litSavedMessage.Text = String.Empty;
+            phOverwriteScript.Visible = false;
             if (!IsPostBack)
             {
                 txtSaveSettingsName.Value = string.Empty;
@@ -822,6 +822,10 @@ namespace ContentExportTool
 
         protected void btnSaveSettings_OnClick(object sender, EventArgs e)
         {
+            PhBrowseFields.Visible = false;
+            PhBrowseTemplates.Visible = false;
+            PhBrowseTree.Visible = false;
+
             var saveName = txtSaveSettingsName.Value;
 
             var settingsData = new ExportSettingsData()
@@ -864,7 +868,7 @@ namespace ContentExportTool
             {
                 if (savedSettings.Settings.Any(x => x.Name == saveName))
                 {
-                    litErrorMessage.Text = "Error: Name has already been used. Please save under a different name";
+                    phOverwriteScript.Visible = true;
                     return;
                 }
 
@@ -872,9 +876,9 @@ namespace ContentExportTool
                 var settingsListJson = serializer.Serialize(savedSettings);
                 File.WriteAllText(_settingsFilePath, settingsListJson);
             }
-            litErrorMessage.Text = "";
             litSavedMessage.Text = "Saved!";
             SetSavedSettingsDropdown();
+            ddSavedSettings.SelectedValue = saveName;
         }
 
         public class SettingsList
@@ -907,6 +911,14 @@ namespace ContentExportTool
         protected void ddSavedSettings_OnSelectedIndexChanged(object sender, EventArgs e)
         {
             var settingsName = ddSavedSettings.SelectedValue;
+            if (String.IsNullOrEmpty(settingsName))
+            {
+                btnDeletePrompt.Visible = false;
+            }
+            else
+            {
+                btnDeletePrompt.Visible = true;
+            }
             var savedSettings = ReadSettingsFromFile();
             if (savedSettings == null) return;
             var selectedSettings = savedSettings.Settings.FirstOrDefault(x => x.Name == settingsName);
@@ -946,117 +958,6 @@ namespace ContentExportTool
             ddSavedSettings.SelectedIndex = 0;
         }
 
-        protected void btnRunImport_OnClick(object sender, EventArgs e)
-        {
-            if (!btnUploadImportFile.HasFile)
-            {
-                litImportMessage.Text = "You must upload a file";
-                return;
-            }
-
-            SetDatabase();
-
-            List<string> headings = new List<string>();
-
-            Stream stream = btnUploadImportFile.FileContent;
-            using (StreamReader sr = new StreamReader(stream))
-            {
-                try
-                {
-                    string line;
-                    int itemPathIndex = 0;
-                    var isHeader = true;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        var cells = LineParser(line).ToList();
-                        if (isHeader)
-                        {
-                            var index = 0;
-                            foreach (var cell in cells)
-                            {
-                                headings.Add(cell);
-                                if (cell.ToLower() == ("item path") || cell.ToLower() == ("item id"))
-                                {
-                                    itemPathIndex = index;
-                                }
-                                index++;
-                            }
-                            isHeader = false;
-                        }
-                        else
-                        {
-                            int index = 0;
-                            // first, get path cell to get item
-                            var itemPath = cells[itemPathIndex];
-                            var item = _db.GetItem(itemPath);
-                            if (item != null)
-                            {
-                                item.Editing.BeginEdit();
-                                foreach (var cell in cells)
-                                {
-                                    // ignore the item path
-                                    if (index != itemPathIndex)
-                                    {
-                                        var fieldName = headings[index];
-                                        var itemField = item.Fields[fieldName];
-                                        if (itemField != null)
-                                        {
-                                            // determine type of field
-                                            var itemOfType = FieldTypeManager.GetField(itemField);
-
-                                            if (itemOfType is ImageField) // if image field
-                                            {
-                                                ImageField imageField = itemField;
-                                                imageField.Clear();
-                                                var mediaPath = cell;
-                                                var mediaItem = _db.GetItem(mediaPath);
-                                                imageField.MediaID = mediaItem.ID;
-                                                imageField.MediaPath = mediaPath;
-                                            }
-                                            else if (itemOfType is LinkField)
-                                            {
-                                                LinkField linkField = itemField;
-                                                linkField.Clear();
-                                                linkField.Url = cell;
-                                            }
-                                            else if (itemOfType is ReferenceField || itemOfType is GroupedDroplistField || itemOfType is LookupField)
-                                            {
-                                                // this requires using item IDs
-                                                ReferenceField refField = itemField;
-                                            }
-                                            else if (itemOfType is MultilistField)
-                                            {
-                                                // this requires using item IDs
-                                                MultilistField multiField = itemField;
-                                            }
-                                            else if (itemOfType is CheckboxField)
-                                            {
-                                                CheckboxField checkboxField = itemField;
-                                            }
-                                            else // default text field
-                                            {
-                                                itemField.Value = cell;
-                                            }
-                                        }
-                                    }
-                                    index++;
-                                }
-                                item.Editing.EndEdit();
-                            }
-                        }
-
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Info(ex.Message, this);
-                    litImportMessage.Text = "An error occurred. Please check the logs for more info";
-                }
-            }
-
-
-        }
-
         protected IEnumerable<string> LineParser(string line)
         {
             int fieldStart = 0;
@@ -1073,5 +974,56 @@ namespace ContentExportTool
         }
 
 
+        protected void btnOverWriteSettings_OnClick(object sender, EventArgs e)
+        {
+            var saveName = txtSaveSettingsName.Value;
+
+            var settingsData = new ExportSettingsData()
+            {
+                Database = ddDatabase.SelectedValue,
+                IncludeIds = chkIncludeIds.Checked,
+                StartItem = inputStartitem.Value,
+                FastQuery = txtFastQuery.Value,
+                Templates = inputTemplates.Value,
+                IncludeTemplateName = chkIncludeTemplate.Checked,
+                Fields = inputFields.Value,
+                IncludeLinkedIds = chkIncludeLinkedIds.Checked,
+                IncludeRaw = chkIncludeRawHtml.Checked,
+                Workflow = chkWorkflowName.Checked,
+                WorkflowState = chkWorkflowState.Checked,
+                GetAllLanguages = chkAllLanguages.Checked
+            };
+
+            var serializer = new JavaScriptSerializer();
+
+            var savedSettings = ReadSettingsFromFile();
+
+            var setting = savedSettings.Settings.FirstOrDefault(x => x.Name == saveName);
+
+            if (setting == null) return;
+            setting.Data = settingsData;
+            var settingsListJson = serializer.Serialize(savedSettings);
+            File.WriteAllText(_settingsFilePath, settingsListJson);
+
+            litSavedMessage.Text = "Saved!";
+            SetSavedSettingsDropdown();
+            ddSavedSettings.SelectedValue = saveName;
+        }
+
+        protected void btnDeleteSavedSetting_OnClick(object sender, EventArgs e)
+        {
+            var settingsName = ddSavedSettings.SelectedValue;
+            var savedSettings = ReadSettingsFromFile();
+
+            var setting = savedSettings.Settings.FirstOrDefault(x => x.Name == settingsName);
+            var serializer = new JavaScriptSerializer();
+            if (setting != null)
+            {
+                savedSettings.Settings.Remove(setting);
+                var settingsListJson = serializer.Serialize(savedSettings);
+                File.WriteAllText(_settingsFilePath, settingsListJson);
+                SetSavedSettingsDropdown();
+            }
+        }
     }
 }

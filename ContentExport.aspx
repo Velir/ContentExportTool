@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="ContentExport.aspx.cs" Inherits="ContentExportTool.ContentExport" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ContentExport.aspx.cs" Inherits="ContentExportTool.ContentExport" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -416,6 +416,10 @@
             display: none;
         }
 
+        .hidden {
+            display: none;
+        }
+
         .clear-selections {
             float: left;
         }
@@ -425,6 +429,16 @@
 
 </head>
 <body>
+<asp:PlaceHolder runat="server" ID="phOverwriteScript" Visible="False">
+    <script>
+        $(document).ready(function() {
+            var overwrite = confirm("There are already settings saved with this name. Do you want to overwrite?");
+            if (overwrite) {
+                $(".btn-overwrite").click();
+            }
+        });
+    </script>
+</asp:PlaceHolder>
     <form id="form1" runat="server">
         <div>
             <h2 id="headline" runat="server">Content Export Tool</h2>
@@ -450,14 +464,17 @@
                                 <input runat="server" id="txtSaveSettingsName" />
                                 <input type="button" class="save-btn-decoy" value="Save Settings" />
                                 <asp:Button runat="server" ID="btnSaveSettings" OnClick="btnSaveSettings_OnClick" Text="Save Settings" /><span class="save-message">
-                                    <asp:Literal runat="server" ID="litSavedMessage"></asp:Literal></span><span class="error-message server"><asp:Literal runat="server" ID="litErrorMessage"></asp:Literal></span>
+                                    <asp:Literal runat="server" ID="litSavedMessage"></asp:Literal></span>
+                                <asp:Button runat="server" ID="btnOverWriteSettings" OnClick="btnOverWriteSettings_OnClick" CssClass="hidden btn-overwrite"/>
 
                                 <span class="error-message">You must enter a name for this configuration<br />
                                 </span>
                             </div>
                             <div class="row">
                                 <span class="header">Saved settings: </span>
-                                <asp:DropDownList runat="server" ID="ddSavedSettings" AutoPostBack="True" OnSelectedIndexChanged="ddSavedSettings_OnSelectedIndexChanged" /><br />
+                                <asp:DropDownList runat="server" ID="ddSavedSettings" AutoPostBack="True" OnSelectedIndexChanged="ddSavedSettings_OnSelectedIndexChanged" />
+                                <a runat="server" Visible="False" ID="btnDeletePrompt" class="btn" onclick="confirmDelete()">Delete</a>
+                                <asp:Button runat="server" ID="btnDeleteSavedSetting" OnClick="btnDeleteSavedSetting_OnClick" CssClass="hidden btn-delete"/><br />
                             </div>
                         </div>
                     </div>
@@ -611,20 +628,9 @@
 
                             <asp:Button runat="server" ID="btnWebformsExport" OnClick="btnWebformsExport_OnClick" Text="Webforms" /><br />
                             <span class="notes">Download all Webforms for Marketers forms and fields</span>
-
-                            <asp:CheckBox runat="server" ID="test" />
                         </div>
                     </div>
                     <br />
-
-                    <span class="header">Content Import</span><br />
-                    <span class="notes">Import an Excel sheet to make bulk content changes.
-                        <br />
-                        Recommended method is to run an export of all files you want to change, edit the fields in the downloaded file, and then import the edited file.<br />
-                        Required columns are Item Path or Item ID</span><br />
-                    <asp:FileUpload runat="server" ID="btnUploadImportFile" /><br />
-                    <asp:Button runat="server" ID="btnRunImport" Text="Import" OnClick="btnRunImport_OnClick" />
-                    <asp:Literal runat="server" ID="litImportMessage"></asp:Literal>
 
                 </div>
 

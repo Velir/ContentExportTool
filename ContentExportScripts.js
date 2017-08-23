@@ -213,3 +213,11 @@ function clearSearch(btn) {
     $(".browse-modal li").removeClass("hidden");
 }
 
+function confirmDelete() {
+    var settings = $("#ddSavedSettings").val();
+    var confirmation = confirm("Are you sure you want to delete '" + settings + "'?");
+    if (confirmation) {
+        $(".btn-delete").click();
+    }
+}
+
