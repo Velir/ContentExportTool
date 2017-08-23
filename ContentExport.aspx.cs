@@ -914,11 +914,10 @@ namespace ContentExportTool
             if (String.IsNullOrEmpty(settingsName))
             {
                 btnDeletePrompt.Visible = false;
+                ClearAll();
+                return;
             }
-            else
-            {
-                btnDeletePrompt.Visible = true;
-            }
+            btnDeletePrompt.Visible = true;
             var savedSettings = ReadSettingsFromFile();
             if (savedSettings == null) return;
             var selectedSettings = savedSettings.Settings.FirstOrDefault(x => x.Name == settingsName);
@@ -942,6 +941,11 @@ namespace ContentExportTool
         }
 
         protected void btnClearAll_OnClick(object sender, EventArgs e)
+        {
+            ClearAll();
+        }
+
+        protected void ClearAll()
         {
             chkIncludeIds.Checked = false;
             inputStartitem.Value = string.Empty;

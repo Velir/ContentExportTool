@@ -565,7 +565,8 @@
                     <br />
 
                     <span class="header">Start Item</span><a class="clear-btn" data-id="inputStartitem">clear</a><br />
-                    <span class="notes">Enter the path or ID of the starting node, or use Browse to select.<br/> Only content beneath and including this node will be exported. If field is left blank, the starting node will be /sitecore/content.</span><br />
+                    <span class="notes">Enter the path or ID of the starting node, or use Browse* to select.<br/> Only content beneath and including this node will be exported. If field is left blank, the starting node will be /sitecore/content.<br/>*Browse might take a while to load</span><br />
+                    
                     <input runat="server" id="inputStartitem" /><asp:Button runat="server" ID="btnBrowse" OnClick="btnBrowse_OnClick" CssClass="browse-btn" Text="Browse" />
                     <br />
                     <span>OR</span><br />
