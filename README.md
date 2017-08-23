@@ -9,5 +9,5 @@ Sitecore 6.5 or higher<br />
 
 # To use:
 You must be logged into Sitecore to access the tool<br />
-Access the toolin the Sitecore start menu or at [your site]/sitecore/admin/ContentExport.aspx
+Access the tool in the Sitecore start menu or at [your site]/sitecore/admin/ContentExport.aspx
 
