@@ -18,6 +18,7 @@ namespace ContentExportTool
         {
             litSavedMessage.Text = String.Empty;
             phOverwriteScript.Visible = false;
+            litFastQueryTest.Text = String.Empty;
             if (!IsPostBack)
             {
                 txtSaveSettingsName.Value = string.Empty;
@@ -70,11 +71,6 @@ namespace ContentExportTool
             var database = ddDatabase.SelectedValue;
             SetDatabase(database);
             var startItem = _db.GetItem("/sitecore/templates");
-
-            var descendants = startItem.Axes.GetDescendants();
-            List<string> templates = (from item in descendants where item.TemplateName == "Template" select item.Name).ToList();
-
-            templates.Sort();
 
             var html = "<ul>";
 
@@ -317,7 +313,8 @@ namespace ContentExportTool
 
                 using (StringWriter sw = new StringWriter())
                 {
-                    var headingString = "Item Path\t" + (includeIds ? "Item ID\t" : string.Empty)
+                    var headingString = "Item Path\t"
+                    + (includeIds ? "Item ID\t" : string.Empty)
                     + (includeTemplate ? "Template\t" : string.Empty)
                     + (allLanguages ? "Language\t" : string.Empty)
                     + GetExcelHeaderForFields(fields, includeLinkedIds, includeRawHtml)
@@ -348,12 +345,7 @@ namespace ContentExportTool
                         foreach (var item in itemVersions)
                         {
                             var itemPath = item.Paths.ContentPath;
-                            var itemLine = itemPath + "\t";
-
-                            if (allLanguages)
-                            {
-                                itemLine += item.Language.GetDisplayName() + "\t";
-                            }
+                            var itemLine = itemPath + "\t";                            
 
                             if (includeIds)
                             {
@@ -364,6 +356,11 @@ namespace ContentExportTool
                             {
                                 var template = item.TemplateName;
                                 itemLine += template + "\t";
+                            }
+
+                            if (allLanguages)
+                            {
+                                itemLine += item.Language.GetDisplayName() + "\t";
                             }
 
                             foreach (var field in fields)
@@ -757,6 +754,7 @@ namespace ContentExportTool
 
         protected void btnTestFastQuery_OnClick(object sender, EventArgs e)
         {
+            HideModals(false, false, false);
             if (!SetDatabase()) SetDatabase("web");
 
             var fastQuery = txtFastQuery.Value;
@@ -779,6 +777,13 @@ namespace ContentExportTool
                 litFastQueryTest.Text = "Error: " + ex.Message;
             }
 
+        }
+
+        protected void HideModals(bool hideBrowse, bool hideTemplates, bool hideFields)
+        {
+            PhBrowseTree.Visible = hideBrowse;
+            PhBrowseFields.Visible = hideTemplates;
+            PhBrowseTemplates.Visible = hideFields;
         }
 
         protected void btnBrowse_OnClick(object sender, EventArgs e)
