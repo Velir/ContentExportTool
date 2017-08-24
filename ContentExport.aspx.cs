@@ -695,47 +695,7 @@ namespace ContentExportTool
             string paragraphSeparator = ((char)0x2029).ToString();
 
             return value.Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty).Replace(lineSeparator, string.Empty).Replace(paragraphSeparator, string.Empty).Replace("<br/>", string.Empty).Replace("<br />", string.Empty).Replace("\t", "   ");
-        }
-
-        protected void btnWebformsExport_OnClick(object sender, EventArgs e)
-        {
-            var startPath = "/sitecore/system/Modules/Web Forms for Marketers";
-            Item startItem = _db.GetItem(startPath);
-
-            var descendants = startItem.Axes.GetDescendants().Where(x => x.TemplateName == "Form");
-
-            Response.Clear();
-            Response.Buffer = true;
-            Response.AddHeader("content-disposition", String.Format("attachment;filename={0}.xls", "WebformsFieldData"));
-            Response.Charset = "";
-            Response.ContentType = "application/vnd.ms-excel";
-
-            using (StringWriter sw = new StringWriter())
-            {
-                sw.WriteLine("Form Name\tForm ID\tField Name\tField ID\tHTML ID\tField Type");
-
-                foreach (var form in descendants)
-                {
-                    var formName = form.Name;
-                    var fields = form.Axes.GetDescendants().Where(x => x.TemplateName == "Field");
-                    var firstField = true;
-                    foreach (var field in fields)
-                    {
-                        var fieldName = field.Name;
-                        var fieldHtmlId = String.Format("form_{0}_field_{1}", FormatGuidForHtmlId(form.ID), FormatGuidForHtmlId(field.ID));
-                        var fieldLink = GetFieldLink(field);
-
-                        sw.WriteLine(String.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", (firstField ? formName : string.Empty), (firstField ? form.ID.ToString() : string.Empty), fieldName, field.ID.ToString(), fieldHtmlId, fieldLink));
-
-                        firstField = false;
-                    }
-                }
-
-                Response.Output.Write(sw.ToString());
-                Response.Flush();
-                Response.End();
-            }
-        }
+        }     
 
         protected string FormatGuidForHtmlId(ID id)
         {

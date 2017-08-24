@@ -626,9 +626,6 @@
 
                             <asp:Button runat="server" ID="btnRunExportDupe" OnClick="btnRunExport_OnClick" Text="Run Export" /><br />
                             <br />
-
-                            <asp:Button runat="server" ID="btnWebformsExport" OnClick="btnWebformsExport_OnClick" Text="Webforms" /><br />
-                            <span class="notes">Download all Webforms for Marketers forms and fields</span>
                         </div>
                     </div>
                     <br />
