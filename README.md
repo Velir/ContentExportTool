@@ -18,4 +18,6 @@ Access the tool in the Sitecore start menu or at [your site]/sitecore/admin/Cont
  /sitecore/admin/ContentExport.aspx.cs	<br/>
  /sitecore/admin/ContentExport.aspx.designer.cs <br/>	
  /sitecore/admin/ContentExportScripts.js <br/>
+ /temp/IconCache/Network/16x16/download.png	
  /temp/IconCache/Network/24x24/download.png	
+ /temp/IconCache/Network/32x32/download.png	
